@@ -100,6 +100,13 @@ export default defineConfig({
   //...
   plugins: [
     media({
+      // { code: string; label: string }[] - the list of languages used for alt texts
+      languages: [
+        { code: 'sv-SE', label: 'Swedish' },
+        { code: 'en-US', label: 'English' },
+        { code: 'fr-FR', label: 'French' },
+        { code: 'de-DE', label: 'German' }
+      ],
       creditLine: {
         enabled: true,
         // boolean - enables an optional "Credit Line" field in the plugin.
