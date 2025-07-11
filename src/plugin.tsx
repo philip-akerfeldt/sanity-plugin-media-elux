@@ -1,11 +1,13 @@
-import {type AssetSource, type Tool as SanityTool, definePlugin} from 'sanity'
-import {ImageIcon} from '@sanity/icons'
+import { type AssetSource, definePlugin, type Tool as SanityTool } from 'sanity'
+
+import { ImageIcon } from '@sanity/icons'
+
 import FormBuilderTool from './components/FormBuilderTool'
 import Tool from './components/Tool'
+import { ToolOptionsProvider } from './contexts/ToolOptionsContext'
 import mediaTag from './schemas/tag'
-import type {MediaToolOptions} from './types'
-import {ToolOptionsProvider} from './contexts/ToolOptionsContext'
 
+import type { MediaToolOptions } from './types'
 const plugin = {
   icon: ImageIcon,
   name: 'media',

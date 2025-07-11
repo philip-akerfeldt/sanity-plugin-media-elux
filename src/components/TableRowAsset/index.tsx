@@ -1,4 +1,4 @@
-import {CheckmarkCircleIcon, EditIcon, WarningFilledIcon} from '@sanity/icons'
+import { CheckmarkCircleIcon, EditIcon, WarningFilledIcon } from '@sanity/icons'
 import {
   Box,
   Checkbox,
@@ -22,22 +22,22 @@ import {
   useRef,
   useState
 } from 'react'
-import {useDispatch} from 'react-redux'
-import {WithReferringDocuments, useColorSchemeValue} from 'sanity'
-import {styled, css} from 'styled-components'
-import {GRID_TEMPLATE_COLUMNS} from '../../constants'
-import {useAssetSourceActions} from '../../contexts/AssetSourceDispatchContext'
+import { useDispatch } from 'react-redux'
+import { WithReferringDocuments, useColorSchemeValue } from 'sanity'
+import { styled, css } from 'styled-components'
+import { GRID_TEMPLATE_COLUMNS } from '../../constants'
+import { useAssetSourceActions } from '../../contexts/AssetSourceDispatchContext'
 import useKeyPress from '../../hooks/useKeyPress'
 import useTypedSelector from '../../hooks/useTypedSelector'
-import {assetsActions, selectAssetById} from '../../modules/assets'
-import {dialogActions} from '../../modules/dialog'
+import { assetsActions, selectAssetById } from '../../modules/assets'
+import { dialogActions } from '../../modules/dialog'
 import getAssetResolution from '../../utils/getAssetResolution'
 import imageDprUrl from '../../utils/imageDprUrl'
-import {isFileAsset, isImageAsset} from '../../utils/typeGuards'
+import { isFileAsset, isImageAsset } from '../../utils/typeGuards'
 import FileIcon from '../FileIcon'
 import Image from '../Image'
-import {getUniqueDocuments} from '../../utils/getUniqueDocuments'
-import {getSchemeColor} from '../../utils/getSchemeColor'
+import { getUniqueDocuments } from '../../utils/getUniqueDocuments'
+import { getSchemeColor } from '../../utils/getSchemeColor'
 
 // Duration (ms) to wait before reference counts (and associated listeners) are rendered
 const REFERENCE_COUNT_VISIBILITY_DELAY = 750
@@ -49,8 +49,8 @@ type Props = {
 
 const ContainerGrid = styled<
   typeof Grid,
-  {$selected?: boolean; $scheme: ThemeColorSchemeKey; $updating?: boolean}
->(Grid)(({$scheme, $selected, $updating}) => {
+  { $selected?: boolean; $scheme: ThemeColorSchemeKey; $updating?: boolean }
+>(Grid)(({ $scheme, $selected, $updating }) => {
   return css`
     align-items: center;
     cursor: ${$selected ? 'default' : 'pointer'};
@@ -70,8 +70,8 @@ const ContainerGrid = styled<
   `
 })
 
-const ContextActionContainer = styled<typeof Flex, {$scheme: ThemeColorSchemeKey}>(Flex)(
-  ({$scheme}) => {
+const ContextActionContainer = styled<typeof Flex, { $scheme: ThemeColorSchemeKey }>(Flex)(
+  ({ $scheme }) => {
     return css`
       cursor: pointer;
       @media (hover: hover) and (pointer: fine) {
@@ -83,7 +83,7 @@ const ContextActionContainer = styled<typeof Flex, {$scheme: ThemeColorSchemeKey
   }
 )
 
-const StyledWarningIcon = styled(WarningFilledIcon)(({theme}) => {
+const StyledWarningIcon = styled(WarningFilledIcon)(({ theme }) => {
   return {
     color: theme.sanity.color.spot.red
   }
@@ -91,7 +91,7 @@ const StyledWarningIcon = styled(WarningFilledIcon)(({theme}) => {
 
 // eslint-disable-next-line complexity
 const TableRowAsset = (props: Props) => {
-  const {id, selected} = props
+  const { id, selected } = props
 
   const scheme = useColorSchemeValue()
 
@@ -112,7 +112,7 @@ const TableRowAsset = (props: Props) => {
   const picked = item?.picked
   const updating = item?.updating
 
-  const {onSelect} = useAssetSourceActions()
+  const { onSelect } = useAssetSourceActions()
 
   const handleContextActionClick = useCallback(
     (e: MouseEvent<HTMLDivElement>) => {
@@ -120,11 +120,11 @@ const TableRowAsset = (props: Props) => {
 
       if (!asset) return
       if (onSelect) {
-        dispatch(dialogActions.showAssetEdit({assetId: asset._id}))
+        dispatch(dialogActions.showAssetEdit({ assetId: asset._id }))
       } else if (shiftPressed.current && !picked) {
-        dispatch(assetsActions.pickRange({startId: lastPicked || asset._id, endId: asset._id}))
+        dispatch(assetsActions.pickRange({ startId: lastPicked || asset._id, endId: asset._id }))
       } else {
-        dispatch(assetsActions.pick({assetId: asset._id, picked: !picked}))
+        dispatch(assetsActions.pick({ assetId: asset._id, picked: !picked }))
       }
     },
     [asset, dispatch, lastPicked, onSelect, picked, shiftPressed]
@@ -136,15 +136,15 @@ const TableRowAsset = (props: Props) => {
 
       if (!asset) return
       if (onSelect) {
-        onSelect([{kind: 'assetDocumentId', value: asset._id}])
+        onSelect([{ kind: 'assetDocumentId', value: asset._id }])
       } else if (shiftPressed.current) {
         if (picked) {
-          dispatch(assetsActions.pick({assetId: asset._id, picked: !picked}))
+          dispatch(assetsActions.pick({ assetId: asset._id, picked: !picked }))
         } else {
-          dispatch(assetsActions.pickRange({startId: lastPicked || asset._id, endId: asset._id}))
+          dispatch(assetsActions.pickRange({ startId: lastPicked || asset._id, endId: asset._id }))
         }
       } else {
-        dispatch(dialogActions.showAssetEdit({assetId: asset._id}))
+        dispatch(dialogActions.showAssetEdit({ assetId: asset._id }))
       }
     },
     [asset, dispatch, lastPicked, onSelect, picked, shiftPressed]
@@ -229,8 +229,8 @@ const TableRowAsset = (props: Props) => {
           width: '100px'
         }}
       >
-        <Flex align="center" justify="center" style={{height: '100%', position: 'relative'}}>
-          <Box style={{height: '100%', opacity: opacityPreview, position: 'relative'}}>
+        <Flex align="center" justify="center" style={{ height: '100%', position: 'relative' }}>
+          <Box style={{ height: '100%', opacity: opacityPreview, position: 'relative' }}>
             {/* File icon */}
             {isFileAsset(asset) && <FileIcon extension={asset.extension} width="40px" />}
 
@@ -240,7 +240,7 @@ const TableRowAsset = (props: Props) => {
                 draggable={false}
                 $scheme={scheme}
                 $showCheckerboard={!isOpaque}
-                src={imageDprUrl(asset, {height: 100, width: 100})}
+                src={imageDprUrl(asset, { height: 100, width: 100 })}
               />
             )}
           </Box>
@@ -292,7 +292,7 @@ const TableRowAsset = (props: Props) => {
           opacity: opacityCell
         }}
       >
-        <Text muted size={1} style={{lineHeight: '2em'}} textOverflow="ellipsis">
+        <Text muted size={1} style={{ lineHeight: '2em' }} textOverflow="ellipsis">
           {asset.originalFilename}
         </Text>
       </Box>
@@ -306,7 +306,7 @@ const TableRowAsset = (props: Props) => {
           opacity: opacityCell
         }}
       >
-        <Text muted size={1} style={{lineHeight: '2em'}} textOverflow="ellipsis">
+        <Text muted size={1} style={{ lineHeight: '2em' }} textOverflow="ellipsis">
           {isImageAsset(asset) && getAssetResolution(asset)}
         </Text>
       </Box>
@@ -320,7 +320,7 @@ const TableRowAsset = (props: Props) => {
           opacity: opacityCell
         }}
       >
-        <Text muted size={1} style={{lineHeight: '2em'}} textOverflow="ellipsis">
+        <Text muted size={1} style={{ lineHeight: '2em' }} textOverflow="ellipsis">
           {asset.mimeType}
         </Text>
       </Box>
@@ -334,8 +334,8 @@ const TableRowAsset = (props: Props) => {
           opacity: opacityCell
         }}
       >
-        <Text muted size={1} style={{lineHeight: '2em'}} textOverflow="ellipsis">
-          {filesize(asset.size, {base: 10, round: 0})}
+        <Text muted size={1} style={{ lineHeight: '2em' }} textOverflow="ellipsis">
+          {filesize(asset.size, { base: 10, round: 0 })}
         </Text>
       </Box>
 
@@ -348,7 +348,7 @@ const TableRowAsset = (props: Props) => {
           opacity: opacityCell
         }}
       >
-        <Text muted size={1} style={{lineHeight: '2em'}} textOverflow="ellipsis">
+        <Text muted size={1} style={{ lineHeight: '2em' }} textOverflow="ellipsis">
           {formatRelative(new Date(asset._updatedAt), new Date())}
         </Text>
       </Box>
@@ -362,10 +362,10 @@ const TableRowAsset = (props: Props) => {
           opacity: opacityCell
         }}
       >
-        <Text muted size={1} style={{lineHeight: '2em'}} textOverflow="ellipsis">
+        <Text muted size={1} style={{ lineHeight: '2em' }} textOverflow="ellipsis">
           {referenceCountVisible ? (
             <WithReferringDocuments id={id}>
-              {({isLoading, referringDocuments}) => {
+              {({ isLoading, referringDocuments }) => {
                 const uniqueDocuments = getUniqueDocuments(referringDocuments)
                 return isLoading ? (
                   <>-</>

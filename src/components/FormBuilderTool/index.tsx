@@ -1,11 +1,13 @@
-import {Box, Portal, PortalProvider, useLayer} from '@sanity/ui'
-import {type SyntheticEvent, useEffect, useState} from 'react'
-import {type AssetSourceComponentProps, type SanityDocument, useFormValue} from 'sanity'
+import { type SyntheticEvent, useEffect, useState } from 'react'
+import { type AssetSourceComponentProps, type SanityDocument, useFormValue } from 'sanity'
+
+import { Box, Portal, PortalProvider, useLayer } from '@sanity/ui'
+
 import useKeyPress from '../../hooks/useKeyPress'
 import Browser from '../Browser'
 
 const FormBuilderTool = (props: AssetSourceComponentProps) => {
-  const {onClose} = props
+  const { onClose } = props
 
   const portalElement = useRootPortalElement()
 
@@ -23,7 +25,7 @@ const FormBuilderTool = (props: AssetSourceComponentProps) => {
     event.stopPropagation()
   }
 
-  const {zIndex} = useLayer()
+  const { zIndex } = useLayer()
 
   return (
     <PortalProvider element={portalElement}>

@@ -6,7 +6,7 @@ import type {
 } from '../types'
 import groq from 'groq'
 
-export const divider: SearchFacetDivider = {type: 'divider'}
+export const divider: SearchFacetDivider = { type: 'divider' }
 
 export const inputs: Record<SearchFacetName, SearchFacetInputProps> = {
   altText: {

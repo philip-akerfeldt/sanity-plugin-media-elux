@@ -1,6 +1,6 @@
-import type {OrderDirection} from '../types'
+import type { OrderDirection } from '../types'
 
-const ORDER_DICTIONARY: Record<string, {asc: string; desc: string}> = {
+const ORDER_DICTIONARY: Record<string, { asc: string; desc: string }> = {
   _createdAt: {
     asc: 'Last created: Oldest first',
     desc: 'Last created: Newest first'

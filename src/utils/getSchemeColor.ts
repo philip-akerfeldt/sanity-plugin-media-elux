@@ -1,5 +1,5 @@
-import {hues} from '@sanity/color'
-import {type ThemeColorSchemeKey, studioTheme} from '@sanity/ui'
+import { hues } from '@sanity/color'
+import { type ThemeColorSchemeKey, studioTheme } from '@sanity/ui'
 
 const SCHEME_COLORS = {
   bg: {

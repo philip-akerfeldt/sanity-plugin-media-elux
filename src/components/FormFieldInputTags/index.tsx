@@ -1,12 +1,14 @@
-import {Box} from '@sanity/ui'
-import {Controller} from 'react-hook-form'
+import { Controller } from 'react-hook-form'
 import CreatableSelect from 'react-select/creatable'
-import {useColorSchemeValue} from 'sanity'
+import { useColorSchemeValue } from 'sanity'
+
+import { Box } from '@sanity/ui'
+
 import useTypedSelector from '../../hooks/useTypedSelector'
-import {reactSelectComponents, reactSelectStyles} from '../../styled/react-select/creatable'
-import type {TagSelectOption} from '../../types'
+import { reactSelectComponents, reactSelectStyles } from '../../styled/react-select/creatable'
 import FormFieldInputLabel from '../FormFieldInputLabel'
 
+import type { TagSelectOption } from '../../types'
 type Props = {
   control: any
   description?: string
@@ -46,7 +48,7 @@ const FormFieldInputTags = (props: Props) => {
   return (
     <Box
       // HACK: force stacking context to ensure react-select dropdown sits above other fields
-      style={{zIndex: 2}}
+      style={{ zIndex: 2 }}
     >
       {/* Label */}
       <FormFieldInputLabel description={description} error={error} label={label} name={name} />
@@ -56,8 +58,8 @@ const FormFieldInputTags = (props: Props) => {
         control={control}
         defaultValue={value}
         name={name}
-        render={({field}) => {
-          const {onBlur, onChange, value: controllerValue} = field
+        render={({ field }) => {
+          const { onBlur, onChange, value: controllerValue } = field
           // TODO: investigate overriding `onChange` and updating form state manually.
           // `opt.media.tags` is initialised with `null` as a defaultValue in react-hook-form
           // Ideally, we'd be able to set `opt.media.tags` as null when all items are cleared, rather than

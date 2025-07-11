@@ -1,16 +1,16 @@
-import {zodResolver} from '@hookform/resolvers/zod'
-import type {MutationEvent} from '@sanity/client'
-import {Box, Button, Card, Flex, Text} from '@sanity/ui'
-import type {DialogTagEditProps, Tag, TagFormData} from '../../types'
+import { zodResolver } from '@hookform/resolvers/zod'
+import type { MutationEvent } from '@sanity/client'
+import { Box, Button, Card, Flex, Text } from '@sanity/ui'
+import type { DialogTagEditProps, Tag, TagFormData } from '../../types'
 import groq from 'groq'
-import {type ReactNode, useCallback, useEffect, useState} from 'react'
-import {type SubmitHandler, useForm} from 'react-hook-form'
-import {useDispatch} from 'react-redux'
-import {tagFormSchema} from '../../formSchema'
+import { type ReactNode, useCallback, useEffect, useState } from 'react'
+import { type SubmitHandler, useForm } from 'react-hook-form'
+import { useDispatch } from 'react-redux'
+import { tagFormSchema } from '../../formSchema'
 import useTypedSelector from '../../hooks/useTypedSelector'
 import useVersionedClient from '../../hooks/useVersionedClient'
-import {dialogActions} from '../../modules/dialog'
-import {selectTagById, tagsActions} from '../../modules/tags'
+import { dialogActions } from '../../modules/dialog'
+import { selectTagById, tagsActions } from '../../modules/tags'
 import sanitizeFormData from '../../utils/sanitizeFormData'
 import Dialog from '../Dialog'
 import FormFieldInputText from '../FormFieldInputText'
@@ -24,7 +24,7 @@ type Props = {
 const DialogTagEdit = (props: Props) => {
   const {
     children,
-    dialog: {id, tagId}
+    dialog: { id, tagId }
   } = props
 
   const client = useVersionedClient()
@@ -42,7 +42,7 @@ const DialogTagEdit = (props: Props) => {
 
   const {
     // Read the formState before render to subscribe the form state through Proxy
-    formState: {errors, isDirty, isValid},
+    formState: { errors, isDirty, isValid },
     handleSubmit,
     register,
     reset,
@@ -56,7 +56,7 @@ const DialogTagEdit = (props: Props) => {
   const formUpdating = !tagItem || tagItem?.updating
 
   const handleClose = () => {
-    dispatch(dialogActions.remove({id}))
+    dispatch(dialogActions.remove({ id }))
   }
 
   // Submit react-hook-form
@@ -94,7 +94,7 @@ const DialogTagEdit = (props: Props) => {
 
   const handleTagUpdate = useCallback(
     (update: MutationEvent) => {
-      const {result, transition} = update
+      const { result, transition } = update
       if (result && transition === 'update') {
         // Regenerate snapshot
         setTagSnapshot(result as Tag)
@@ -121,7 +121,7 @@ const DialogTagEdit = (props: Props) => {
 
     // Remember that Sanity listeners ignore joins, order clauses and projections
     const subscriptionAsset = client
-      .listen(groq`*[_id == $id]`, {id: tagItem?.tag._id})
+      .listen(groq`*[_id == $id]`, { id: tagItem?.tag._id })
       .subscribe(handleTagUpdate)
 
     return () => {
@@ -169,7 +169,7 @@ const DialogTagEdit = (props: Props) => {
         )}
 
         {/* Hidden button to enable enter key submissions */}
-        <button style={{display: 'none'}} tabIndex={-1} type="submit" />
+        <button style={{ display: 'none' }} tabIndex={-1} type="submit" />
 
         {/* Title */}
         <FormFieldInputText

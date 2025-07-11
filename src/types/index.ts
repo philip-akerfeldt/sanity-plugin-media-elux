@@ -1,16 +1,19 @@
-import type {Action} from '@reduxjs/toolkit'
+import type { Action } from '@reduxjs/toolkit'
 import type {
   SanityAssetDocument,
   SanityClient,
   SanityDocument,
   SanityImageAssetDocument
 } from '@sanity/client'
-import type {Epic} from 'redux-observable'
+import type { Epic } from 'redux-observable'
 import * as z from 'zod'
-import {assetFormSchema, tagFormSchema, tagOptionSchema} from '../formSchema'
-import type {RootReducerState} from '../modules/types'
+
+import { assetFormSchema, tagFormSchema, tagOptionSchema } from '../formSchema'
+
+import type { RootReducerState } from '../modules/types'
 
 export type MediaToolOptions = {
+  languages: { code: string; label: string }[]
   maximumUploadSize?: number
   creditLine: {
     enabled: boolean
@@ -20,6 +23,7 @@ export type MediaToolOptions = {
 
 type CustomFields = {
   altText?: string
+  altTexts?: Record<string, string>
   description?: string
   opt?: {
     media?: {
@@ -50,7 +54,7 @@ export type AssetItem = {
   updating: boolean
 }
 
-export type AssetType = 'file' | 'image'
+export type AssetType = 'file' | 'image' | 'sanity.video'
 
 export type Block = {
   _type: string
@@ -159,7 +163,7 @@ export type ImageAsset = SanityImageAssetDocument &
     creditLine?: string
   }
 
-export type MarkDef = {_key: string; _type: string}
+export type MarkDef = { _key: string; _type: string }
 
 export type MyEpic = Epic<
   Action,
@@ -297,7 +301,7 @@ export type SanityUploadProgressEvent = {
 }
 
 export type SanityUploadResponseEvent = {
-  body: {document: Partial<SanityAssetDocument | SanityImageAssetDocument>}
+  body: { document: Partial<SanityAssetDocument | SanityImageAssetDocument> }
   headers: Record<string, string>
   method: string
   statusCode: number

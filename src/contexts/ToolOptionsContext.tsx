@@ -1,10 +1,11 @@
-import type {MediaToolOptions} from '../types'
-import {type PropsWithChildren, createContext, useContext, useMemo} from 'react'
-import type {DropzoneOptions} from 'react-dropzone'
+import type { MediaToolOptions } from '../types'
+import { type PropsWithChildren, createContext, useContext, useMemo } from 'react'
+import type { DropzoneOptions } from 'react-dropzone'
 
 type ContextProps = {
   dropzone: Pick<DropzoneOptions, 'maxSize'>
   creditLine: MediaToolOptions['creditLine']
+  languages: MediaToolOptions['languages']
 }
 
 const ToolOptionsContext = createContext<ContextProps | null>(null)
@@ -13,7 +14,7 @@ type Props = {
   options?: MediaToolOptions | void
 }
 
-export const ToolOptionsProvider = ({options, children}: PropsWithChildren<Props>) => {
+export const ToolOptionsProvider = ({ options, children }: PropsWithChildren<Props>) => {
   const value = useMemo<ContextProps>(() => {
     let creditLineExcludeSources
 
@@ -24,16 +25,18 @@ export const ToolOptionsProvider = ({options, children}: PropsWithChildren<Props
     }
 
     return {
-      dropzone: {maxSize: options?.maximumUploadSize},
+      dropzone: { maxSize: options?.maximumUploadSize },
       creditLine: {
         enabled: options?.creditLine?.enabled || false,
         excludeSources: creditLineExcludeSources
-      }
+      },
+      languages: options?.languages || []
     }
   }, [
     options?.creditLine?.enabled,
     options?.creditLine?.excludeSources,
-    options?.maximumUploadSize
+    options?.maximumUploadSize,
+    options?.languages
   ])
 
   return <ToolOptionsContext.Provider value={value}>{children}</ToolOptionsContext.Provider>

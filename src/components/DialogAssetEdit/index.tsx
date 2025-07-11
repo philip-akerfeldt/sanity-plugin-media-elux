@@ -1,23 +1,24 @@
-import {zodResolver} from '@hookform/resolvers/zod'
-import type {MutationEvent} from '@sanity/client'
-import {Box, Button, Card, Flex, Stack, Tab, TabList, TabPanel, Text} from '@sanity/ui'
-import type {Asset, AssetFormData, DialogAssetEditProps, TagSelectOption} from '../../types'
 import groq from 'groq'
-import {type ReactNode, useCallback, useEffect, useRef, useState} from 'react'
-import {type SubmitHandler, useForm} from 'react-hook-form'
-import {useDispatch} from 'react-redux'
-import {WithReferringDocuments, useColorSchemeValue, useDocumentStore} from 'sanity'
-import {assetFormSchema} from '../../formSchema'
+import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
+import { type SubmitHandler, useForm } from 'react-hook-form'
+import { useDispatch } from 'react-redux'
+import { useColorSchemeValue, useDocumentStore, WithReferringDocuments } from 'sanity'
+
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Box, Button, Card, Flex, Stack, Tab, TabList, TabPanel, Text } from '@sanity/ui'
+
+import { useToolOptions } from '../../contexts/ToolOptionsContext'
+import { assetFormSchema } from '../../formSchema'
 import useTypedSelector from '../../hooks/useTypedSelector'
 import useVersionedClient from '../../hooks/useVersionedClient'
-import {assetsActions, selectAssetById} from '../../modules/assets'
-import {dialogActions} from '../../modules/dialog'
-import {selectTags, selectTagSelectOptions, tagsActions} from '../../modules/tags'
+import { assetsActions, selectAssetById } from '../../modules/assets'
+import { dialogActions } from '../../modules/dialog'
+import { selectTags, selectTagSelectOptions, tagsActions } from '../../modules/tags'
 import getTagSelectOptions from '../../utils/getTagSelectOptions'
-import {getUniqueDocuments} from '../../utils/getUniqueDocuments'
+import { getUniqueDocuments } from '../../utils/getUniqueDocuments'
 import imageDprUrl from '../../utils/imageDprUrl'
 import sanitizeFormData from '../../utils/sanitizeFormData'
-import {isFileAsset, isImageAsset} from '../../utils/typeGuards'
+import { isFileAsset, isImageAsset } from '../../utils/typeGuards'
 import AssetMetadata from '../AssetMetadata'
 import Dialog from '../Dialog'
 import DocumentList from '../DocumentList'
@@ -27,8 +28,9 @@ import FormFieldInputText from '../FormFieldInputText'
 import FormFieldInputTextarea from '../FormFieldInputTextarea'
 import FormSubmitButton from '../FormSubmitButton'
 import Image from '../Image'
-import {useToolOptions} from '../../contexts/ToolOptionsContext'
 
+import type { MutationEvent } from '@sanity/client'
+import type { Asset, AssetFormData, DialogAssetEditProps, TagSelectOption } from '../../types'
 type Props = {
   children: ReactNode
   dialog: DialogAssetEditProps
@@ -37,7 +39,7 @@ type Props = {
 const DialogAssetEdit = (props: Props) => {
   const {
     children,
-    dialog: {assetId, id, lastCreatedTag, lastRemovedTagIds}
+    dialog: { assetId, id, lastCreatedTag, lastRemovedTagIds }
   } = props
 
   const client = useVersionedClient()
@@ -61,16 +63,16 @@ const DialogAssetEdit = (props: Props) => {
   const assetTagOptions = useTypedSelector(selectTagSelectOptions(currentAsset))
 
   // Check if credit line options are configured
-  const {creditLine} = useToolOptions()
+  const { creditLine, languages } = useToolOptions()
 
   const generateDefaultValues = useCallback(
     (asset?: Asset): AssetFormData => {
       return {
-        altText: asset?.altText || '',
+        altTexts: asset?.altTexts || {},
         creditLine: asset?.creditLine || '',
         description: asset?.description || '',
         originalFilename: asset?.originalFilename || '',
-        opt: {media: {tags: assetTagOptions}},
+        opt: { media: { tags: assetTagOptions } },
         title: asset?.title || ''
       }
     },
@@ -80,7 +82,7 @@ const DialogAssetEdit = (props: Props) => {
   const {
     control,
     // Read the formState before render to subscribe the form state through Proxy
-    formState: {errors, isDirty, isValid},
+    formState: { errors, isDirty, isValid },
     getValues,
     handleSubmit,
     register,
@@ -95,7 +97,7 @@ const DialogAssetEdit = (props: Props) => {
   const formUpdating = !assetItem || assetItem?.updating
 
   const handleClose = useCallback(() => {
-    dispatch(dialogActions.remove({id}))
+    dispatch(dialogActions.remove({ id }))
   }, [dispatch, id])
 
   const handleDelete = useCallback(() => {
@@ -112,7 +114,7 @@ const DialogAssetEdit = (props: Props) => {
   }, [assetItem, dispatch])
 
   const handleAssetUpdate = useCallback((update: MutationEvent) => {
-    const {result, transition} = update
+    const { result, transition } = update
     if (result && transition === 'update') {
       // Regenerate asset snapshot
       setAssetSnapshot(result as Asset)
@@ -174,7 +176,7 @@ const DialogAssetEdit = (props: Props) => {
 
     // Remember that Sanity listeners ignore joins, order clauses and projections
     const subscriptionAsset = client
-      .listen(groq`*[_id == $id]`, {id: assetItem?.asset._id})
+      .listen(groq`*[_id == $id]`, { id: assetItem?.asset._id })
       .subscribe(handleAssetUpdate)
 
     return () => {
@@ -187,7 +189,7 @@ const DialogAssetEdit = (props: Props) => {
     if (lastCreatedTag) {
       const existingTags = (getValues('opt.media.tags') as TagSelectOption[]) || []
       const updatedTags = existingTags.concat([lastCreatedTag])
-      setValue('opt.media.tags', updatedTags, {shouldDirty: true})
+      setValue('opt.media.tags', updatedTags, { shouldDirty: true })
     }
   }, [getValues, lastCreatedTag, setValue])
 
@@ -199,7 +201,7 @@ const DialogAssetEdit = (props: Props) => {
         return !lastRemovedTagIds.includes(tag.value)
       })
 
-      setValue('opt.media.tags', updatedTags, {shouldDirty: true})
+      setValue('opt.media.tags', updatedTags, { shouldDirty: true })
     }
   }, [getValues, lastRemovedTagIds, setValue])
 
@@ -256,7 +258,7 @@ const DialogAssetEdit = (props: Props) => {
       <Flex direction={['column-reverse', 'column-reverse', 'row-reverse']}>
         <Box flex={1} marginTop={[5, 5, 0]} padding={4}>
           <WithReferringDocuments documentStore={documentStore} id={currentAsset._id}>
-            {({isLoading, referringDocuments}) => {
+            {({ isLoading, referringDocuments }) => {
               const uniqueReferringDocuments = getUniqueDocuments(referringDocuments)
               return (
                 <>
@@ -296,7 +298,7 @@ const DialogAssetEdit = (props: Props) => {
                     )}
 
                     {/* Hidden button to enable enter key submissions */}
-                    <button style={{display: 'none'}} tabIndex={-1} type="submit" />
+                    <button style={{ display: 'none' }} tabIndex={-1} type="submit" />
 
                     {/* Panel: details */}
                     <TabPanel
@@ -336,14 +338,27 @@ const DialogAssetEdit = (props: Props) => {
                           value={currentAsset?.title}
                         />
                         {/* Alt text */}
-                        <FormFieldInputText
+                        {/* <FormFieldInputText
                           {...register('altText')}
                           disabled={formUpdating}
                           error={errors?.altText?.message}
                           label="Alt Text"
                           name="altText"
                           value={currentAsset?.altText}
-                        />
+                        /> */}
+                        <Stack space={2}>
+                          {languages.map(language => (
+                            <FormFieldInputText
+                              key={language.code}
+                              {...register(`altTexts.${language.code}`)}
+                              disabled={formUpdating}
+                              error={errors?.altTexts?.[language.code]?.message}
+                              label={`Alt text (${language.code})`}
+                              name={`altTexts.${language.code}`}
+                              value={currentAsset?.altTexts?.[language.code] || ''}
+                            />
+                          ))}
+                        </Stack>
                         {/* Description */}
                         <FormFieldInputTextarea
                           {...register('description')}
@@ -394,7 +409,7 @@ const DialogAssetEdit = (props: Props) => {
         </Box>
 
         <Box flex={1} padding={4}>
-          <Box style={{aspectRatio: '1'}}>
+          <Box style={{ aspectRatio: '1' }}>
             {/* File */}
             {isFileAsset(currentAsset) && <FileAssetPreview asset={currentAsset} />}
 
@@ -404,7 +419,7 @@ const DialogAssetEdit = (props: Props) => {
                 draggable={false}
                 $scheme={scheme}
                 $showCheckerboard={!currentAsset?.metadata?.isOpaque}
-                src={imageDprUrl(currentAsset, {height: 600, width: 600})}
+                src={imageDprUrl(currentAsset, { height: 600, width: 600 })}
               />
             )}
           </Box>

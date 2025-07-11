@@ -1,5 +1,5 @@
-import {studioTheme} from '@sanity/ui'
-import {useEffect, useState} from 'react'
+import { studioTheme } from '@sanity/ui'
+import { useEffect, useState } from 'react'
 
 // Determine the current breakpoint index
 // - create MediaQueryLists from every breakpoint defined in our sanity studio theme

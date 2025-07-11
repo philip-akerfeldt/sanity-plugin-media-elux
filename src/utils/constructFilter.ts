@@ -1,7 +1,7 @@
-import type {AssetType, SearchFacetInputProps} from '../types'
+import type { AssetType, SearchFacetInputProps } from '../types'
 import groq from 'groq'
 
-import {operators} from '../config/searchFacets'
+import { operators } from '../config/searchFacets'
 
 const constructFilter = ({
   assetTypes,
@@ -23,7 +23,7 @@ const constructFilter = ({
 
   const searchFacetFragments = searchFacets.reduce((acc: string[], facet) => {
     if (facet.type === 'number') {
-      const {field, modifier, modifiers, operatorType, value} = facet
+      const { field, modifier, modifiers, operatorType, value } = facet
       const operator = operators[operatorType]
 
       // Get current modifier
@@ -41,7 +41,7 @@ const constructFilter = ({
     }
 
     if (facet.type === 'searchable') {
-      const {field, operatorType, value} = facet
+      const { field, operatorType, value } = facet
       const operator = operators[operatorType]
 
       const fragment = operator.fn(value?.value, field)
@@ -51,7 +51,7 @@ const constructFilter = ({
     }
 
     if (facet.type === 'select') {
-      const {field, operatorType, options, value} = facet
+      const { field, operatorType, options, value } = facet
       const operator = operators[operatorType]
 
       const currentOptionValue = options?.find(l => l.name === value)?.value
@@ -63,7 +63,7 @@ const constructFilter = ({
     }
 
     if (facet.type === 'string') {
-      const {field, operatorType, value} = facet
+      const { field, operatorType, value } = facet
       const operator = operators[operatorType]
 
       const fragment = operator.fn(value, field)

@@ -1,15 +1,15 @@
-import {white} from '@sanity/color'
-import {Flex, Text} from '@sanity/ui'
-import {type ReactNode} from 'react'
-import {type DropEvent, type DropzoneOptions, useDropzone} from 'react-dropzone'
-import {useDispatch} from 'react-redux'
-import {styled} from 'styled-components'
-import {useAssetSourceActions} from '../../contexts/AssetSourceDispatchContext'
-import {DropzoneDispatchProvider} from '../../contexts/DropzoneDispatchContext'
+import { white } from '@sanity/color'
+import { Flex, Text } from '@sanity/ui'
+import { type ReactNode } from 'react'
+import { type DropEvent, type DropzoneOptions, useDropzone } from 'react-dropzone'
+import { useDispatch } from 'react-redux'
+import { styled } from 'styled-components'
+import { useAssetSourceActions } from '../../contexts/AssetSourceDispatchContext'
+import { DropzoneDispatchProvider } from '../../contexts/DropzoneDispatchContext'
 import useTypedSelector from '../../hooks/useTypedSelector'
-import {notificationsActions} from '../../modules/notifications'
-import {uploadsActions} from '../../modules/uploads'
-import {useToolOptions} from '../../contexts/ToolOptionsContext'
+import { notificationsActions } from '../../modules/notifications'
+import { uploadsActions } from '../../modules/uploads'
+import { useToolOptions } from '../../contexts/ToolOptionsContext'
 
 type Props = {
   children: ReactNode
@@ -61,13 +61,13 @@ async function filterFiles(fileList: FileList) {
 }
 
 const UploadDropzone = (props: Props) => {
-  const {children} = props
+  const { children } = props
 
   const {
-    dropzone: {maxSize}
+    dropzone: { maxSize }
   } = useToolOptions()
 
-  const {onSelect} = useAssetSourceActions()
+  const { onSelect } = useAssetSourceActions()
 
   // Redux
   const dispatch = useDispatch()
@@ -88,7 +88,7 @@ const UploadDropzone = (props: Props) => {
   }
 
   const handleDropRejected: DropzoneOptions['onDropRejected'] = rejections => {
-    const errorCodes = rejections.flatMap(({errors}) => errors.map(({code}) => code))
+    const errorCodes = rejections.flatMap(({ errors }) => errors.map(({ code }) => code))
 
     if (errorCodes.includes('file-too-large')) {
       dispatch(
@@ -134,7 +134,7 @@ const UploadDropzone = (props: Props) => {
   }
 
   // Limit file picking to only images if we're specifically within an image selection context (e.g. picking from image fields)
-  const {getRootProps, getInputProps, isDragActive, open} = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     accept: isImageAssetType ? 'image/*' : '',
     getFilesFromEvent: handleFileGetter,
     noClick: true,
@@ -153,8 +153,8 @@ const UploadDropzone = (props: Props) => {
 
         {isDragActive && (
           <DragActiveContainer>
-            <Flex direction="column" justify="center" style={{color: white.hex}}>
-              <Text size={3} style={{color: 'inherit'}}>
+            <Flex direction="column" justify="center" style={{ color: white.hex }}>
+              <Text size={3} style={{ color: 'inherit' }}>
                 Drop files to upload
               </Text>
             </Flex>

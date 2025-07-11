@@ -1,9 +1,9 @@
-import {CloseIcon, Icon, UploadIcon} from '@sanity/icons'
-import {Box, Button, Flex, Inline, Text} from '@sanity/ui'
+import { CloseIcon, Icon, UploadIcon } from '@sanity/icons'
+import { Box, Button, Flex, Inline, Text } from '@sanity/ui'
 import pluralize from 'pluralize'
 
-import {useAssetSourceActions} from '../../contexts/AssetSourceDispatchContext'
-import {useDropzoneActions} from '../../contexts/DropzoneDispatchContext'
+import { useAssetSourceActions } from '../../contexts/AssetSourceDispatchContext'
+import { useDropzoneActions } from '../../contexts/DropzoneDispatchContext'
 import useTypedSelector from '../../hooks/useTypedSelector'
 
 type Props = {
@@ -11,10 +11,10 @@ type Props = {
 }
 
 const Header = (props: Props) => {
-  const {onClose} = props
+  const { onClose } = props
 
-  const {open} = useDropzoneActions()
-  const {onSelect} = useAssetSourceActions()
+  const { open } = useDropzoneActions()
+  const { onSelect } = useAssetSourceActions()
 
   // Redux
   const assetTypes = useTypedSelector(state => state.assets.assetTypes)
@@ -26,7 +26,7 @@ const Header = (props: Props) => {
       <Flex align="center" justify="space-between">
         {/* Label */}
         <Box flex={1} marginX={3}>
-          <Inline style={{whiteSpace: 'nowrap'}}>
+          <Inline style={{ whiteSpace: 'nowrap' }}>
             <Text textOverflow="ellipsis" weight="semibold">
               <span>{onSelect ? `Insert ${assetTypes.join(' or ')}` : 'Browse Assets'}</span>
             </Text>
@@ -34,10 +34,10 @@ const Header = (props: Props) => {
             {selectedDocument && (
               <Box display={['none', 'none', 'block']}>
                 <Text>
-                  <span style={{margin: '0 0.5em'}}>
+                  <span style={{ margin: '0 0.5em' }}>
                     <Icon symbol="arrow-right" />
                   </span>
-                  <span style={{textTransform: 'capitalize'}}>{selectedDocument._type}</span>
+                  <span style={{ textTransform: 'capitalize' }}>{selectedDocument._type}</span>
                 </Text>
               </Box>
             )}
@@ -57,7 +57,7 @@ const Header = (props: Props) => {
 
           {/* Close */}
           {onClose && (
-            <Box style={{flexShrink: 0}}>
+            <Box style={{ flexShrink: 0 }}>
               <Button
                 disabled={!onClose}
                 icon={CloseIcon}

@@ -1,6 +1,6 @@
-import type {Block} from '../types'
+import type { Block } from '../types'
 
-const defaults = {nonTextBehavior: 'remove'}
+const defaults = { nonTextBehavior: 'remove' }
 
 // Serialize portable text to plain text
 // Based off: https://www.sanity.io/docs/presenting-block-text#plain-text-serialization

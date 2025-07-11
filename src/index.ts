@@ -1,2 +1,2 @@
-export {media, mediaAssetSource} from './plugin'
-export type {MediaToolOptions} from './types'
+export { media, mediaAssetSource } from './plugin'
+export type { MediaToolOptions } from './types'

@@ -1,5 +1,5 @@
-import {defineConfig} from 'sanity'
-import {media} from './src'
+import { defineConfig } from 'sanity'
+import { media } from './src'
 
 export default defineConfig({
   name: 'sanity-plugin-media',

@@ -1,5 +1,5 @@
-import {Observable, from, of} from 'rxjs'
-import {mergeMap} from 'rxjs/operators'
+import { Observable, from, of } from 'rxjs'
+import { mergeMap } from 'rxjs/operators'
 
 const PREVIEW_WIDTH = 180 // px
 

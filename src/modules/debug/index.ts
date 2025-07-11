@@ -1,4 +1,4 @@
-import {type PayloadAction, createSlice} from '@reduxjs/toolkit'
+import { type PayloadAction, createSlice } from '@reduxjs/toolkit'
 
 type DebugReducerState = {
   badConnection: boolean
@@ -23,6 +23,6 @@ const debugSlice = createSlice({
   }
 })
 
-export const debugActions = {...debugSlice.actions}
+export const debugActions = { ...debugSlice.actions }
 
 export default debugSlice.reducer

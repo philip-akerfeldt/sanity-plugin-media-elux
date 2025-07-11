@@ -4,11 +4,11 @@ import type {
   SearchFacetGroup,
   OrderDirection
 } from './types'
-import {divider, inputs} from './config/searchFacets'
+import { divider, inputs } from './config/searchFacets'
 
 // Sort order dropdown options
 // null values are represented as menu dividers
-export const ORDER_OPTIONS: ({direction: OrderDirection; field: string} | null)[] = [
+export const ORDER_OPTIONS: ({ direction: OrderDirection; field: string } | null)[] = [
   {
     direction: 'desc',
     field: '_createdAt'

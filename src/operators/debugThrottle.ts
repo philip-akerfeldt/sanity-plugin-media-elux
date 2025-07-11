@@ -1,5 +1,5 @@
-import {iif, type Observable, of, throwError} from 'rxjs'
-import {delay, mergeMap} from 'rxjs/operators'
+import { iif, type Observable, of, throwError } from 'rxjs'
+import { delay, mergeMap } from 'rxjs/operators'
 
 const debugThrottle = (throttled?: boolean) => {
   return function <T>(source: Observable<T>): Observable<T> {

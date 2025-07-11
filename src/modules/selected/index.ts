@@ -1,5 +1,5 @@
-import {createSlice} from '@reduxjs/toolkit'
-import type {SanityAssetDocument, SanityDocument, SanityImageAssetDocument} from '@sanity/client'
+import { createSlice } from '@reduxjs/toolkit'
+import type { SanityAssetDocument, SanityDocument, SanityImageAssetDocument } from '@sanity/client'
 
 type SelectedReducerState = {
   assets: (SanityAssetDocument | SanityImageAssetDocument)[]

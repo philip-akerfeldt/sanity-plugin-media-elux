@@ -1,15 +1,15 @@
-import {type AnyAction, configureStore, type Store} from '@reduxjs/toolkit'
-import type {SanityClient} from '@sanity/client'
-import type {AssetSourceComponentProps, SanityDocument} from 'sanity'
-import {Component, type ReactNode} from 'react'
-import {Provider} from 'react-redux'
-import {createEpicMiddleware} from 'redux-observable'
-import {rootEpic, rootReducer} from '../../modules'
-import {initialState as assetsInitialState} from '../../modules/assets'
+import { type AnyAction, configureStore, type Store } from '@reduxjs/toolkit'
+// import type { SanityClient } from '@sanity/client'
+import type { AssetSourceComponentProps, SanityClient, SanityDocument } from 'sanity'
+import { Component, type ReactNode } from 'react'
+import { Provider } from 'react-redux'
+import { createEpicMiddleware } from 'redux-observable'
+import { rootEpic, rootReducer } from '../../modules'
+import { initialState as assetsInitialState } from '../../modules/assets'
 // import {assetsActions} from '../../modules/assets'
 // import {searchActions} from '../../modules/search'
 // import {uploadsActions} from '../../modules/uploads'
-import type {RootReducerState} from '../../modules/types'
+import type { RootReducerState } from '../../modules/types'
 import getDocumentAssetIds from '../../utils/getDocumentAssetIds'
 
 type Props = {
@@ -59,9 +59,9 @@ class ReduxProvider extends Component<Props> {
           badConnection: false,
           enabled: false
         },
-        dialog: {items: []},
-        notifications: {items: []},
-        search: {facets: [], query: ''},
+        dialog: { items: [] },
+        notifications: { items: [] },
+        search: { facets: [], query: '' },
         selected: {
           assets: props.selectedAssets || [],
           document: props.document,

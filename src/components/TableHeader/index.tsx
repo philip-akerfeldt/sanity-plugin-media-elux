@@ -1,18 +1,18 @@
-import {Checkbox, Flex, Grid, type ThemeColorSchemeKey, useMediaIndex} from '@sanity/ui'
-import {type MouseEvent} from 'react'
-import {useDispatch} from 'react-redux'
-import {styled, css} from 'styled-components'
-import {GRID_TEMPLATE_COLUMNS, PANEL_HEIGHT} from '../../constants'
-import {useAssetSourceActions} from '../../contexts/AssetSourceDispatchContext'
+import { Checkbox, Flex, Grid, type ThemeColorSchemeKey, useMediaIndex } from '@sanity/ui'
+import { type MouseEvent } from 'react'
+import { useDispatch } from 'react-redux'
+import { styled, css } from 'styled-components'
+import { GRID_TEMPLATE_COLUMNS, PANEL_HEIGHT } from '../../constants'
+import { useAssetSourceActions } from '../../contexts/AssetSourceDispatchContext'
 import useTypedSelector from '../../hooks/useTypedSelector'
-import {assetsActions, selectAssetsLength, selectAssetsPickedLength} from '../../modules/assets'
+import { assetsActions, selectAssetsLength, selectAssetsPickedLength } from '../../modules/assets'
 import TableHeaderItem from '../TableHeaderItem'
-import {useColorSchemeValue} from 'sanity'
-import {getSchemeColor} from '../../utils/getSchemeColor'
+import { useColorSchemeValue } from 'sanity'
+import { getSchemeColor } from '../../utils/getSchemeColor'
 
 // TODO: DRY
-const ContextActionContainer = styled<typeof Flex, {$scheme: ThemeColorSchemeKey}>(Flex)(
-  ({$scheme}) => {
+const ContextActionContainer = styled<typeof Flex, { $scheme: ThemeColorSchemeKey }>(Flex)(
+  ({ $scheme }) => {
     return css`
       cursor: pointer;
       @media (hover: hover) and (pointer: fine) {
@@ -34,7 +34,7 @@ const TableHeader = () => {
   const numPickedAssets = useTypedSelector(selectAssetsPickedLength)
 
   const mediaIndex = useMediaIndex()
-  const {onSelect} = useAssetSourceActions()
+  const { onSelect } = useAssetSourceActions()
 
   const allSelected = numPickedAssets === itemsLength
 

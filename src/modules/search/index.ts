@@ -1,11 +1,11 @@
-import {type PayloadAction, createSelector, createSlice} from '@reduxjs/toolkit'
-import type {MyEpic, SearchFacetInputProps, SearchFacetOperatorType, WithId} from '../../types'
-import {EMPTY, of} from 'rxjs'
-import {filter, mergeMap, withLatestFrom} from 'rxjs/operators'
-import {uuid} from '@sanity/uuid'
+import { type PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit'
+import type { MyEpic, SearchFacetInputProps, SearchFacetOperatorType, WithId } from '../../types'
+import { EMPTY, of } from 'rxjs'
+import { filter, mergeMap, withLatestFrom } from 'rxjs/operators'
+import { uuid } from '@sanity/uuid'
 
-import {tagsActions} from '../tags'
-import type {RootReducerState} from '../types'
+import { tagsActions } from '../tags'
+import type { RootReducerState } from '../types'
 
 // TODO: don't store non-serializable data in the search store
 // (The main offender is `fieldModifier` which is currently a function)
@@ -25,19 +25,19 @@ const searchSlice = createSlice({
   initialState,
   reducers: {
     // Add search facet
-    facetsAdd(state, action: PayloadAction<{facet: SearchFacetInputProps}>) {
-      state.facets.push({...action.payload.facet, id: uuid()})
+    facetsAdd(state, action: PayloadAction<{ facet: SearchFacetInputProps }>) {
+      state.facets.push({ ...action.payload.facet, id: uuid() })
     },
     // Clear all search facets
     facetsClear(state) {
       state.facets = []
     },
     // Remove search facet by name
-    facetsRemoveByName(state, action: PayloadAction<{facetName: string}>) {
+    facetsRemoveByName(state, action: PayloadAction<{ facetName: string }>) {
       state.facets = state.facets.filter(facet => facet.name !== action.payload.facetName)
     },
     // Remove search facet by name
-    facetsRemoveByTag(state, action: PayloadAction<{tagId: string}>) {
+    facetsRemoveByTag(state, action: PayloadAction<{ tagId: string }>) {
       state.facets = state.facets.filter(
         facet =>
           !(
@@ -49,7 +49,7 @@ const searchSlice = createSlice({
       )
     },
     // Remove search facet by name
-    facetsRemoveById(state, action: PayloadAction<{facetId: string}>) {
+    facetsRemoveById(state, action: PayloadAction<{ facetId: string }>) {
       state.facets = state.facets.filter(facet => facet.id !== action.payload.facetId)
     },
     // Update an existing search facet
@@ -62,7 +62,7 @@ const searchSlice = createSlice({
         value?: any // TODO: type correctly
       }>
     ) {
-      const {modifier, name, operatorType, value} = action.payload
+      const { modifier, name, operatorType, value } = action.payload
 
       const facet = state.facets.find(f => f.name === name)
 
@@ -92,7 +92,7 @@ const searchSlice = createSlice({
         value?: any // TODO: type correctly
       }>
     ) {
-      const {modifier, id, operatorType, value} = action.payload
+      const { modifier, id, operatorType, value } = action.payload
 
       state.facets.forEach((facet, index) => {
         if (facet.id === id) {
@@ -109,7 +109,7 @@ const searchSlice = createSlice({
       })
     },
     // Update existing search query
-    querySet(state, action: PayloadAction<{searchQuery: string}>) {
+    querySet(state, action: PayloadAction<{ searchQuery: string }>) {
       state.query = action.payload?.searchQuery
     }
   }
@@ -123,7 +123,7 @@ export const searchFacetTagUpdateEpic: MyEpic = (action$, state$) =>
     filter(tagsActions.updateComplete.match),
     withLatestFrom(state$),
     mergeMap(([action, state]) => {
-      const {tag} = action.payload
+      const { tag } = action.payload
 
       const currentSearchFacetTag = state.search.facets?.find(facet => facet.name === 'tag')
       const tagItem = state.tags.byIds[tag._id]
@@ -162,6 +162,6 @@ export const selectIsSearchFacetTag = createSelector(
     )
 )
 
-export const searchActions = {...searchSlice.actions}
+export const searchActions = { ...searchSlice.actions }
 
 export default searchSlice.reducer

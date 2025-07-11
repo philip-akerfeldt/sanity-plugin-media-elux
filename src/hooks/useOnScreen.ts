@@ -1,4 +1,4 @@
-import {type RefObject, useEffect, useState} from 'react'
+import { type RefObject, useEffect, useState } from 'react'
 
 const useOnScreen = (ref: RefObject<HTMLElement>, options = {}, once: boolean) => {
   const [isIntersecting, setIntersecting] = useState(false)

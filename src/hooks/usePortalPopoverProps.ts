@@ -1,4 +1,4 @@
-import {type PopoverProps, usePortal} from '@sanity/ui'
+import { type PopoverProps, usePortal } from '@sanity/ui'
 
 export function usePortalPopoverProps(): PopoverProps {
   const portal = usePortal()

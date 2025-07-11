@@ -1,7 +1,7 @@
 // Takes a observable-returning function and returns a new function that limits on the number of
 // concurrent observables.
-import {first, mergeMap} from 'rxjs/operators'
-import {Subject, Subscription, Observable, from} from 'rxjs'
+import { first, mergeMap } from 'rxjs/operators'
+import { Subject, Subscription, Observable, from } from 'rxjs'
 
 const DEFAULT_CONCURRENCY = 4
 

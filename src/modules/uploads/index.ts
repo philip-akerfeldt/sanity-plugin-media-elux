@@ -1,16 +1,16 @@
-import {createSelector, createSlice, type PayloadAction} from '@reduxjs/toolkit'
-import type {ClientError, SanityAssetDocument, SanityImageAssetDocument} from '@sanity/client'
-import type {HttpError, MyEpic, SanityUploadProgressEvent, UploadItem} from '../../types'
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit'
+import type { ClientError, SanityAssetDocument, SanityImageAssetDocument } from '@sanity/client'
+import type { HttpError, MyEpic, SanityUploadProgressEvent, UploadItem } from '../../types'
 import groq from 'groq'
-import type {Selector} from 'react-redux'
-import {empty, merge, of} from 'rxjs'
-import {catchError, delay, filter, mergeMap, takeUntil, withLatestFrom} from 'rxjs/operators'
+import type { Selector } from 'react-redux'
+import { empty, merge, of } from 'rxjs'
+import { catchError, delay, filter, mergeMap, takeUntil, withLatestFrom } from 'rxjs/operators'
 import constructFilter from '../../utils/constructFilter'
-import {generatePreviewBlobUrl$} from '../../utils/generatePreviewBlobUrl'
-import {hashFile$, uploadAsset$} from '../../utils/uploadSanityAsset'
-import {assetsActions} from '../assets'
-import type {RootReducerState} from '../types'
-import {UPLOADS_ACTIONS} from './actions'
+import { generatePreviewBlobUrl$ } from '../../utils/generatePreviewBlobUrl'
+import { hashFile$, uploadAsset$ } from '../../utils/uploadSanityAsset'
+import { assetsActions } from '../assets'
+import type { RootReducerState } from '../types'
+import { UPLOADS_ACTIONS } from './actions'
 
 export type UploadsReducerState = {
   allIds: string[]
@@ -28,7 +28,7 @@ const uploadsSlice = createSlice({
   extraReducers: builder => {
     builder //
       .addCase(UPLOADS_ACTIONS.uploadComplete, (state, action) => {
-        const {asset} = action.payload
+        const { asset } = action.payload
         if (state.byIds[asset.sha1hash]) {
           state.byIds[asset.sha1hash].status = 'complete'
         }
@@ -37,12 +37,12 @@ const uploadsSlice = createSlice({
   reducers: {
     checkRequest(
       _state,
-      _action: PayloadAction<{assets: (SanityAssetDocument | SanityImageAssetDocument)[]}>
+      _action: PayloadAction<{ assets: (SanityAssetDocument | SanityImageAssetDocument)[] }>
     ) {
       //
     },
-    checkComplete(state, action: PayloadAction<{results: Record<string, string | null>}>) {
-      const {results} = action.payload
+    checkComplete(state, action: PayloadAction<{ results: Record<string, string | null> }>) {
+      const { results } = action.payload
 
       const assetHashes = Object.keys(results)
 
@@ -62,14 +62,14 @@ const uploadsSlice = createSlice({
         }
       })
     },
-    previewReady(state, action: PayloadAction<{hash: string; blobUrl: string}>) {
-      const {blobUrl, hash} = action.payload
+    previewReady(state, action: PayloadAction<{ hash: string; blobUrl: string }>) {
+      const { blobUrl, hash } = action.payload
       if (state.byIds[hash]) {
         state.byIds[hash].objectUrl = blobUrl
       }
     },
-    uploadCancel(state, action: PayloadAction<{hash: string}>) {
-      const {hash} = action.payload
+    uploadCancel(state, action: PayloadAction<{ hash: string }>) {
+      const { hash } = action.payload
       const deleteIndex = state.allIds.indexOf(hash)
       if (deleteIndex >= 0) {
         state.allIds.splice(deleteIndex, 1)
@@ -78,8 +78,8 @@ const uploadsSlice = createSlice({
         delete state.byIds[hash]
       }
     },
-    uploadError(state, action: PayloadAction<{error: HttpError; hash: string}>) {
-      const {hash} = action.payload
+    uploadError(state, action: PayloadAction<{ error: HttpError; hash: string }>) {
+      const { hash } = action.payload
       const deleteIndex = state.allIds.indexOf(hash)
       if (deleteIndex >= 0) {
         state.allIds.splice(deleteIndex, 1)
@@ -88,20 +88,20 @@ const uploadsSlice = createSlice({
     },
     uploadRequest(
       _state,
-      _action: PayloadAction<{file: File; forceAsAssetType?: 'file' | 'image'}>
+      _action: PayloadAction<{ file: File; forceAsAssetType?: 'file' | 'image' | 'sanity.video' }>
     ) {
       //
     },
     uploadProgress(
       state,
-      action: PayloadAction<{event: SanityUploadProgressEvent; uploadHash: string}>
+      action: PayloadAction<{ event: SanityUploadProgressEvent; uploadHash: string }>
     ) {
-      const {event, uploadHash} = action.payload
+      const { event, uploadHash } = action.payload
       state.byIds[uploadHash].percent = event.percent
       state.byIds[uploadHash].status = 'uploading'
     },
-    uploadStart(state, action: PayloadAction<{file: File; uploadItem: UploadItem}>) {
-      const {uploadItem} = action.payload
+    uploadStart(state, action: PayloadAction<{ file: File; uploadItem: UploadItem }>) {
+      const { uploadItem } = action.payload
       if (!state.allIds.includes(uploadItem.hash)) {
         state.allIds.push(uploadItem.hash)
       }
@@ -112,11 +112,11 @@ const uploadsSlice = createSlice({
 
 // Epics
 
-export const uploadsAssetStartEpic: MyEpic = (action$, _state$, {client}) =>
+export const uploadsAssetStartEpic: MyEpic = (action$, _state$, { client }) =>
   action$.pipe(
     filter(uploadsActions.uploadStart.match),
     mergeMap(action => {
-      const {file, uploadItem} = action.payload
+      const { file, uploadItem } = action.payload
 
       return merge(
         // Generate low res preview
@@ -180,7 +180,7 @@ export const uploadsAssetUploadEpic: MyEpic = (action$, state$) =>
     filter(uploadsActions.uploadRequest.match),
     withLatestFrom(state$),
     mergeMap(([action, state]) => {
-      const {file, forceAsAssetType} = action.payload
+      const { file, forceAsAssetType } = action.payload
 
       return of(action).pipe(
         // Generate SHA1 hash from local file
@@ -202,7 +202,7 @@ export const uploadsAssetUploadEpic: MyEpic = (action$, state$) =>
             size: file.size,
             status: 'queued'
           } as UploadItem
-          return of(uploadsActions.uploadStart({file, uploadItem}))
+          return of(uploadsActions.uploadStart({ file, uploadItem }))
         })
       )
     })
@@ -220,12 +220,12 @@ export const uploadsCompleteQueueEpic: MyEpic = action$ =>
     })
   )
 
-export const uploadsCheckRequestEpic: MyEpic = (action$, state$, {client}) =>
+export const uploadsCheckRequestEpic: MyEpic = (action$, state$, { client }) =>
   action$.pipe(
     filter(uploadsActions.checkRequest.match),
     withLatestFrom(state$),
     mergeMap(([action, state]) => {
-      const {assets} = action.payload
+      const { assets } = action.payload
 
       const documentIds = assets.map(asset => asset._id)
 
@@ -241,7 +241,7 @@ export const uploadsCheckRequestEpic: MyEpic = (action$, state$, {client}) =>
 
       return of(action).pipe(
         delay(1000), // give Sanity some time to register the recently uploaded asset
-        mergeMap(() => client.observable.fetch<string[]>(query, {documentIds})),
+        mergeMap(() => client.observable.fetch<string[]>(query, { documentIds })),
         mergeMap(resultHashes => {
           const checkedResults = assets.reduce((acc: Record<string, string | null>, asset) => {
             acc[asset.sha1hash] = resultHashes.includes(asset.sha1hash) ? asset._id : null
@@ -249,8 +249,8 @@ export const uploadsCheckRequestEpic: MyEpic = (action$, state$, {client}) =>
           }, {})
 
           return of(
-            uploadsActions.checkComplete({results: checkedResults}), //
-            assetsActions.insertUploads({results: checkedResults})
+            uploadsActions.checkComplete({ results: checkedResults }), //
+            assetsActions.insertUploads({ results: checkedResults })
           )
         })
       )
@@ -276,6 +276,6 @@ export const selectUploads: Selector<RootReducerState, UploadItem[]> = createSel
   (byIds, allIds) => allIds.map(id => byIds[id])
 )
 
-export const uploadsActions = {...uploadsSlice.actions}
+export const uploadsActions = { ...uploadsSlice.actions }
 
 export default uploadsSlice.reducer

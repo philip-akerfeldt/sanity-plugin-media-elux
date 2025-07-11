@@ -1,5 +1,28 @@
-import {createSelector, createSlice, type PayloadAction} from '@reduxjs/toolkit'
-import type {ClientError, Patch, Transaction} from '@sanity/client'
+import groq from 'groq'
+import { nanoid } from 'nanoid'
+import { ofType } from 'redux-observable'
+import { EMPTY, from, of } from 'rxjs'
+import {
+  bufferTime,
+  catchError,
+  debounceTime,
+  filter,
+  mergeMap,
+  switchMap,
+  withLatestFrom
+} from 'rxjs/operators'
+
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit'
+
+import { getOrderTitle } from '../../config/orders'
+import { ORDER_OPTIONS } from '../../constants'
+import debugThrottle from '../../operators/debugThrottle'
+import constructFilter from '../../utils/constructFilter'
+import { searchActions } from '../search'
+import { UPLOADS_ACTIONS } from '../uploads/actions'
+import { ASSETS_ACTIONS } from './actions'
+
+import type { ClientError, Patch, Transaction } from '@sanity/client'
 import type {
   Asset,
   AssetItem,
@@ -11,28 +34,8 @@ import type {
   OrderDirection,
   Tag
 } from '../../types'
-import groq from 'groq'
-import {nanoid} from 'nanoid'
-import type {Selector} from 'react-redux'
-import {ofType} from 'redux-observable'
-import {EMPTY, from, of} from 'rxjs'
-import {
-  bufferTime,
-  catchError,
-  debounceTime,
-  filter,
-  mergeMap,
-  switchMap,
-  withLatestFrom
-} from 'rxjs/operators'
-import {getOrderTitle} from '../../config/orders'
-import {ORDER_OPTIONS} from '../../constants'
-import debugThrottle from '../../operators/debugThrottle'
-import constructFilter from '../../utils/constructFilter'
-import {searchActions} from '../search'
-import type {RootReducerState} from '../types'
-import {UPLOADS_ACTIONS} from '../uploads/actions'
-import {ASSETS_ACTIONS} from './actions'
+import type { Selector } from 'react-redux'
+import type { RootReducerState } from '../types'
 type ItemError = {
   description: string
   id: string
@@ -97,7 +100,7 @@ const assetsSlice = createSlice({
   extraReducers: builder => {
     builder //
       .addCase(UPLOADS_ACTIONS.uploadComplete, (state, action) => {
-        const {asset} = action.payload
+        const { asset } = action.payload
 
         state.byIds[asset._id] = {
           _type: 'asset',
@@ -107,37 +110,37 @@ const assetsSlice = createSlice({
         }
       })
       .addCase(ASSETS_ACTIONS.tagsAddComplete, (state, action) => {
-        const {assets} = action.payload
+        const { assets } = action.payload
         assets.forEach(asset => {
           state.byIds[asset.asset._id].updating = false
         })
       })
       .addCase(ASSETS_ACTIONS.tagsAddError, (state, action) => {
-        const {assets} = action.payload
+        const { assets } = action.payload
         assets.forEach(asset => {
           state.byIds[asset.asset._id].updating = false
         })
       })
       .addCase(ASSETS_ACTIONS.tagsAddRequest, (state, action) => {
-        const {assets} = action.payload
+        const { assets } = action.payload
         assets.forEach(asset => {
           state.byIds[asset.asset._id].updating = true
         })
       })
       .addCase(ASSETS_ACTIONS.tagsRemoveComplete, (state, action) => {
-        const {assets} = action.payload
+        const { assets } = action.payload
         assets.forEach(asset => {
           state.byIds[asset.asset._id].updating = false
         })
       })
       .addCase(ASSETS_ACTIONS.tagsRemoveError, (state, action) => {
-        const {assets} = action.payload
+        const { assets } = action.payload
         assets.forEach(asset => {
           state.byIds[asset.asset._id].updating = false
         })
       })
       .addCase(ASSETS_ACTIONS.tagsRemoveRequest, (state, action) => {
-        const {assets} = action.payload
+        const { assets } = action.payload
         assets.forEach(asset => {
           state.byIds[asset.asset._id].updating = true
         })
@@ -149,8 +152,8 @@ const assetsSlice = createSlice({
       state.allIds = []
     },
     // Remove assets and update page index
-    deleteComplete(state, action: PayloadAction<{assetIds: string[]}>) {
-      const {assetIds} = action.payload
+    deleteComplete(state, action: PayloadAction<{ assetIds: string[] }>) {
+      const { assetIds } = action.payload
 
       assetIds?.forEach(id => {
         const deleteIndex = state.allIds.indexOf(id)
@@ -162,8 +165,8 @@ const assetsSlice = createSlice({
 
       state.pageIndex = Math.floor(state.allIds.length / state.pageSize) - 1
     },
-    deleteError(state, action: PayloadAction<{assetIds: string[]; error: ClientError}>) {
-      const {assetIds, error} = action.payload
+    deleteError(state, action: PayloadAction<{ assetIds: string[]; error: ClientError }>) {
+      const { assetIds, error } = action.payload
       const itemErrors: ItemError[] = error?.response?.body?.error?.items?.map(
         (item: any) => item.error
       )
@@ -175,8 +178,8 @@ const assetsSlice = createSlice({
         state.byIds[item.id].error = item.description
       })
     },
-    deleteRequest(state, action: PayloadAction<{assets: Asset[]; closeDialogId?: string}>) {
-      const {assets} = action.payload
+    deleteRequest(state, action: PayloadAction<{ assets: Asset[]; closeDialogId?: string }>) {
+      const { assets } = action.payload
       assets.forEach(asset => {
         state.byIds[asset?._id].updating = true
       })
@@ -185,7 +188,7 @@ const assetsSlice = createSlice({
         delete state.byIds[key].error
       })
     },
-    fetchComplete(state, action: PayloadAction<{assets: Asset[]}>) {
+    fetchComplete(state, action: PayloadAction<{ assets: Asset[] }>) {
       const assets = action.payload?.assets || []
 
       if (assets) {
@@ -212,7 +215,7 @@ const assetsSlice = createSlice({
       state.fetchingError = error
     },
     fetchRequest: {
-      reducer: (state, _action: PayloadAction<{params: Record<string, any>; query: string}>) => {
+      reducer: (state, _action: PayloadAction<{ params: Record<string, any>; query: string }>) => {
         state.fetching = true
         delete state.fetchingError
       },
@@ -239,6 +242,7 @@ const assetsSlice = createSlice({
               _createdAt,
               _updatedAt,
               altText,
+              altTexts,
               creditLine,
               description,
               extension,
@@ -262,11 +266,11 @@ const assetsSlice = createSlice({
           }
         `
 
-        return {payload: {params, query}}
+        return { payload: { params, query } }
       }
     },
-    insertUploads(state, action: PayloadAction<{results: Record<string, string | null>}>) {
-      const {results} = action.payload
+    insertUploads(state, action: PayloadAction<{ results: Record<string, string | null> }>) {
+      const { results } = action.payload
 
       Object.entries(results).forEach(([hash, assetId]) => {
         if (assetId && !state.allIds.includes(hash)) {
@@ -274,22 +278,22 @@ const assetsSlice = createSlice({
         }
       })
     },
-    listenerCreateQueue(_state, _action: PayloadAction<{asset: Asset}>) {
+    listenerCreateQueue(_state, _action: PayloadAction<{ asset: Asset }>) {
       //
     },
-    listenerCreateQueueComplete(state, action: PayloadAction<{assets: Asset[]}>) {
-      const {assets} = action.payload
+    listenerCreateQueueComplete(state, action: PayloadAction<{ assets: Asset[] }>) {
+      const { assets } = action.payload
       assets?.forEach(asset => {
         if (state.byIds[asset?._id]?.asset) {
           state.byIds[asset._id].asset = asset
         }
       })
     },
-    listenerDeleteQueue(_state, _action: PayloadAction<{assetId: string}>) {
+    listenerDeleteQueue(_state, _action: PayloadAction<{ assetId: string }>) {
       //
     },
-    listenerDeleteQueueComplete(state, action: PayloadAction<{assetIds: string[]}>) {
-      const {assetIds} = action.payload
+    listenerDeleteQueueComplete(state, action: PayloadAction<{ assetIds: string[] }>) {
+      const { assetIds } = action.payload
       assetIds?.forEach(assetId => {
         const deleteIndex = state.allIds.indexOf(assetId)
         if (deleteIndex >= 0) {
@@ -298,11 +302,11 @@ const assetsSlice = createSlice({
         delete state.byIds[assetId]
       })
     },
-    listenerUpdateQueue(_state, _action: PayloadAction<{asset: Asset}>) {
+    listenerUpdateQueue(_state, _action: PayloadAction<{ asset: Asset }>) {
       //
     },
-    listenerUpdateQueueComplete(state, action: PayloadAction<{assets: Asset[]}>) {
-      const {assets} = action.payload
+    listenerUpdateQueueComplete(state, action: PayloadAction<{ assets: Asset[] }>) {
+      const { assets } = action.payload
       assets?.forEach(asset => {
         if (state.byIds[asset?._id]?.asset) {
           state.byIds[asset._id].asset = asset
@@ -312,16 +316,16 @@ const assetsSlice = createSlice({
     loadNextPage() {
       //
     },
-    loadPageIndex(state, action: PayloadAction<{pageIndex: number}>) {
+    loadPageIndex(state, action: PayloadAction<{ pageIndex: number }>) {
       //
       state.pageIndex = action.payload.pageIndex
     },
-    orderSet(state, action: PayloadAction<{order: Order}>) {
+    orderSet(state, action: PayloadAction<{ order: Order }>) {
       state.order = action.payload?.order
       state.pageIndex = 0
     },
-    pick(state, action: PayloadAction<{assetId: string; picked: boolean}>) {
-      const {assetId, picked} = action.payload
+    pick(state, action: PayloadAction<{ assetId: string; picked: boolean }>) {
+      const { assetId, picked } = action.payload
 
       state.byIds[assetId].picked = picked
       state.lastPicked = picked ? assetId : undefined
@@ -337,7 +341,7 @@ const assetsSlice = createSlice({
         state.byIds[asset.asset._id].picked = false
       })
     },
-    pickRange(state, action: PayloadAction<{endId: string; startId: string}>) {
+    pickRange(state, action: PayloadAction<{ endId: string; startId: string }>) {
       const startIndex = state.allIds.findIndex(id => id === action.payload.startId)
       const endIndex = state.allIds.findIndex(id => id === action.payload.endId)
 
@@ -362,13 +366,13 @@ const assetsSlice = createSlice({
         return 0
       })
     },
-    updateComplete(state, action: PayloadAction<{asset: Asset; closeDialogId?: string}>) {
-      const {asset} = action.payload
+    updateComplete(state, action: PayloadAction<{ asset: Asset; closeDialogId?: string }>) {
+      const { asset } = action.payload
       state.byIds[asset._id].updating = false
       state.byIds[asset._id].asset = asset
     },
-    updateError(state, action: PayloadAction<{asset: Asset; error: HttpError}>) {
-      const {asset, error} = action.payload
+    updateError(state, action: PayloadAction<{ asset: Asset; error: HttpError }>) {
+      const { asset, error } = action.payload
 
       const assetId = asset?._id
       state.byIds[assetId].error = error.message
@@ -376,12 +380,12 @@ const assetsSlice = createSlice({
     },
     updateRequest(
       state,
-      action: PayloadAction<{asset: Asset; closeDialogId?: string; formData: Record<string, any>}>
+      action: PayloadAction<{ asset: Asset; closeDialogId?: string; formData: Record<string, any> }>
     ) {
       const assetId = action.payload?.asset?._id
       state.byIds[assetId].updating = true
     },
-    viewSet(state, action: PayloadAction<{view: BrowserView}>) {
+    viewSet(state, action: PayloadAction<{ view: BrowserView }>) {
       state.view = action.payload?.view
     }
   }
@@ -389,11 +393,11 @@ const assetsSlice = createSlice({
 
 // Epics
 
-export const assetsDeleteEpic: MyEpic = (action$, _state$, {client}) =>
+export const assetsDeleteEpic: MyEpic = (action$, _state$, { client }) =>
   action$.pipe(
     filter(assetsActions.deleteRequest.match),
     mergeMap(action => {
-      const {assets} = action.payload
+      const { assets } = action.payload
       const assetIds = assets.map(asset => asset._id)
       return of(assets).pipe(
         mergeMap(() =>
@@ -401,15 +405,15 @@ export const assetsDeleteEpic: MyEpic = (action$, _state$, {client}) =>
             query: groq`*[_id in ${JSON.stringify(assetIds)}]`
           })
         ),
-        mergeMap(() => of(assetsActions.deleteComplete({assetIds}))),
+        mergeMap(() => of(assetsActions.deleteComplete({ assetIds }))),
         catchError((error: ClientError) => {
-          return of(assetsActions.deleteError({assetIds, error}))
+          return of(assetsActions.deleteError({ assetIds, error }))
         })
       )
     })
   )
 
-export const assetsFetchEpic: MyEpic = (action$, state$, {client}) =>
+export const assetsFetchEpic: MyEpic = (action$, state$, { client }) =>
   action$.pipe(
     filter(assetsActions.fetchRequest.match),
     withLatestFrom(state$),
@@ -429,7 +433,7 @@ export const assetsFetchEpic: MyEpic = (action$, state$, {client}) =>
             items
             // totalCount
           } = result
-          return of(assetsActions.fetchComplete({assets: items}))
+          return of(assetsActions.fetchComplete({ assets: items }))
         }),
         catchError((error: ClientError) =>
           of(
@@ -463,7 +467,7 @@ export const assetsFetchPageIndexEpic: MyEpic = (action$, state$) =>
       })
 
       const params = {
-        ...(documentId ? {documentId} : {}),
+        ...(documentId ? { documentId } : {}),
         documentAssetIds
       }
 
@@ -483,7 +487,7 @@ export const assetsFetchNextPageEpic: MyEpic = (action$, state$) =>
     filter(assetsActions.loadNextPage.match),
     withLatestFrom(state$),
     switchMap(([_action, state]) =>
-      of(assetsActions.loadPageIndex({pageIndex: state.assets.pageIndex + 1}))
+      of(assetsActions.loadPageIndex({ pageIndex: state.assets.pageIndex + 1 }))
     )
   )
 
@@ -494,7 +498,7 @@ export const assetsFetchAfterDeleteAllEpic: MyEpic = (action$, state$) =>
     switchMap(([_action, state]) => {
       if (state.assets.allIds.length === 0) {
         const nextPageIndex = Math.floor(state.assets.allIds.length / state.assets.pageSize)
-        return of(assetsActions.loadPageIndex({pageIndex: nextPageIndex}))
+        return of(assetsActions.loadPageIndex({ pageIndex: nextPageIndex }))
       }
 
       return EMPTY
@@ -507,25 +511,27 @@ const filterAssetWithoutTag = (tag: Tag) => (asset: AssetItem) => {
 }
 
 const patchOperationTagAppend =
-  ({tag}: {tag: Tag}) =>
+  ({ tag }: { tag: Tag }) =>
   (patch: Patch) =>
     patch
-      .setIfMissing({opt: {}})
-      .setIfMissing({'opt.media': {}})
-      .setIfMissing({'opt.media.tags': []})
-      .append('opt.media.tags', [{_key: nanoid(), _ref: tag?._id, _type: 'reference', _weak: true}])
+      .setIfMissing({ opt: {} })
+      .setIfMissing({ 'opt.media': {} })
+      .setIfMissing({ 'opt.media.tags': [] })
+      .append('opt.media.tags', [
+        { _key: nanoid(), _ref: tag?._id, _type: 'reference', _weak: true }
+      ])
 
 const patchOperationTagUnset =
-  ({asset, tag}: {asset: AssetItem; tag: Tag}) =>
+  ({ asset, tag }: { asset: AssetItem; tag: Tag }) =>
   (patch: Patch) =>
     patch.ifRevisionId(asset?.asset?._rev).unset([`opt.media.tags[_ref == "${tag._id}"]`])
 
-export const assetsRemoveTagsEpic: MyEpic = (action$, state$, {client}) => {
+export const assetsRemoveTagsEpic: MyEpic = (action$, state$, { client }) => {
   return action$.pipe(
     filter(ASSETS_ACTIONS.tagsAddRequest.match),
     withLatestFrom(state$),
     mergeMap(([action, state]) => {
-      const {assets, tag} = action.payload
+      const { assets, tag } = action.payload
 
       return of(action).pipe(
         // Optionally throttle
@@ -538,14 +544,15 @@ export const assetsRemoveTagsEpic: MyEpic = (action$, state$, {client}) => {
           const pickedAssetsFiltered = pickedAssets?.filter(filterAssetWithoutTag(tag))
 
           const transaction: Transaction = pickedAssetsFiltered.reduce(
-            (tx, pickedAsset) => tx.patch(pickedAsset?.asset?._id, patchOperationTagAppend({tag})),
+            (tx, pickedAsset) =>
+              tx.patch(pickedAsset?.asset?._id, patchOperationTagAppend({ tag })),
             client.transaction()
           )
 
           return from(transaction.commit())
         }),
         // Dispatch complete action
-        mergeMap(() => of(ASSETS_ACTIONS.tagsAddComplete({assets, tag}))),
+        mergeMap(() => of(ASSETS_ACTIONS.tagsAddComplete({ assets, tag }))),
         catchError((error: ClientError) =>
           of(
             ASSETS_ACTIONS.tagsAddError({
@@ -569,7 +576,7 @@ export const assetsOrderSetEpic: MyEpic = action$ =>
     mergeMap(() => {
       return of(
         assetsActions.clear(), //
-        assetsActions.loadPageIndex({pageIndex: 0})
+        assetsActions.loadPageIndex({ pageIndex: 0 })
       )
     })
   )
@@ -590,7 +597,7 @@ export const assetsSearchEpic: MyEpic = action$ =>
     mergeMap(() => {
       return of(
         assetsActions.clear(), //
-        assetsActions.loadPageIndex({pageIndex: 0})
+        assetsActions.loadPageIndex({ pageIndex: 0 })
       )
     })
   )
@@ -602,7 +609,7 @@ export const assetsListenerCreateQueueEpic: MyEpic = action$ =>
     filter(actions => actions.length > 0),
     mergeMap(actions => {
       const assets = actions?.map(action => action.payload.asset)
-      return of(assetsActions.listenerCreateQueueComplete({assets}))
+      return of(assetsActions.listenerCreateQueueComplete({ assets }))
     })
   )
 
@@ -613,7 +620,7 @@ export const assetsListenerDeleteQueueEpic: MyEpic = action$ =>
     filter(actions => actions.length > 0),
     mergeMap(actions => {
       const assetIds = actions?.map(action => action.payload.assetId)
-      return of(assetsActions.listenerDeleteQueueComplete({assetIds}))
+      return of(assetsActions.listenerDeleteQueueComplete({ assetIds }))
     })
   )
 
@@ -624,7 +631,7 @@ export const assetsListenerUpdateQueueEpic: MyEpic = action$ =>
     filter(actions => actions.length > 0),
     mergeMap(actions => {
       const assets = actions?.map(action => action.payload.asset)
-      return of(assetsActions.listenerUpdateQueueComplete({assets}))
+      return of(assetsActions.listenerUpdateQueueComplete({ assets }))
     })
   )
 
@@ -639,12 +646,12 @@ export const assetsSortEpic: MyEpic = action$ =>
     mergeMap(() => of(assetsActions.sort()))
   )
 
-export const assetsTagsAddEpic: MyEpic = (action$, state$, {client}) => {
+export const assetsTagsAddEpic: MyEpic = (action$, state$, { client }) => {
   return action$.pipe(
     filter(ASSETS_ACTIONS.tagsAddRequest.match),
     withLatestFrom(state$),
     mergeMap(([action, state]) => {
-      const {assets, tag} = action.payload
+      const { assets, tag } = action.payload
 
       return of(action).pipe(
         // Optionally throttle
@@ -657,14 +664,15 @@ export const assetsTagsAddEpic: MyEpic = (action$, state$, {client}) => {
           const pickedAssetsFiltered = pickedAssets?.filter(filterAssetWithoutTag(tag))
 
           const transaction: Transaction = pickedAssetsFiltered.reduce(
-            (tx, pickedAsset) => tx.patch(pickedAsset?.asset?._id, patchOperationTagAppend({tag})),
+            (tx, pickedAsset) =>
+              tx.patch(pickedAsset?.asset?._id, patchOperationTagAppend({ tag })),
             client.transaction()
           )
 
           return from(transaction.commit())
         }),
         // Dispatch complete action
-        mergeMap(() => of(ASSETS_ACTIONS.tagsAddComplete({assets, tag}))),
+        mergeMap(() => of(ASSETS_ACTIONS.tagsAddComplete({ assets, tag }))),
         catchError((error: ClientError) =>
           of(
             ASSETS_ACTIONS.tagsAddError({
@@ -682,12 +690,12 @@ export const assetsTagsAddEpic: MyEpic = (action$, state$, {client}) => {
   )
 }
 
-export const assetsTagsRemoveEpic: MyEpic = (action$, state$, {client}) => {
+export const assetsTagsRemoveEpic: MyEpic = (action$, state$, { client }) => {
   return action$.pipe(
     filter(ASSETS_ACTIONS.tagsRemoveRequest.match),
     withLatestFrom(state$),
     mergeMap(([action, state]) => {
-      const {assets, tag} = action.payload
+      const { assets, tag } = action.payload
 
       return of(action).pipe(
         // Optionally throttle
@@ -698,14 +706,17 @@ export const assetsTagsRemoveEpic: MyEpic = (action$, state$, {client}) => {
 
           const transaction: Transaction = pickedAssets.reduce(
             (tx, pickedAsset) =>
-              tx.patch(pickedAsset?.asset?._id, patchOperationTagUnset({asset: pickedAsset, tag})),
+              tx.patch(
+                pickedAsset?.asset?._id,
+                patchOperationTagUnset({ asset: pickedAsset, tag })
+              ),
             client.transaction()
           )
 
           return from(transaction.commit())
         }),
         // Dispatch complete action
-        mergeMap(() => of(ASSETS_ACTIONS.tagsRemoveComplete({assets, tag}))),
+        mergeMap(() => of(ASSETS_ACTIONS.tagsRemoveComplete({ assets, tag }))),
         catchError((error: ClientError) =>
           of(
             ASSETS_ACTIONS.tagsRemoveError({
@@ -742,12 +753,12 @@ export const assetsUnpickEpic: MyEpic = action$ =>
     })
   )
 
-export const assetsUpdateEpic: MyEpic = (action$, state$, {client}) =>
+export const assetsUpdateEpic: MyEpic = (action$, state$, { client }) =>
   action$.pipe(
     filter(assetsActions.updateRequest.match),
     withLatestFrom(state$),
     mergeMap(([action, state]) => {
-      const {asset, closeDialogId, formData} = action.payload
+      const { asset, closeDialogId, formData } = action.payload
 
       return of(action).pipe(
         debugThrottle(state.debug.badConnection),
@@ -755,8 +766,8 @@ export const assetsUpdateEpic: MyEpic = (action$, state$, {client}) =>
           from(
             client
               .patch(asset._id)
-              .setIfMissing({opt: {}})
-              .setIfMissing({'opt.media': {}})
+              .setIfMissing({ opt: {} })
+              .setIfMissing({ 'opt.media': {} })
               .set(formData)
               .commit()
           )
@@ -817,6 +828,6 @@ export const selectAssetsPickedLength = createSelector(
   assetsPicked => assetsPicked.length
 )
 
-export const assetsActions = {...assetsSlice.actions}
+export const assetsActions = { ...assetsSlice.actions }
 
 export default assetsSlice.reducer

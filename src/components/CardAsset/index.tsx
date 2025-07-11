@@ -1,4 +1,4 @@
-import {CheckmarkCircleIcon, EditIcon, WarningFilledIcon} from '@sanity/icons'
+import { CheckmarkCircleIcon, EditIcon, WarningFilledIcon } from '@sanity/icons'
 import {
   Box,
   Checkbox,
@@ -10,21 +10,21 @@ import {
   type ThemeColorSchemeKey,
   Tooltip
 } from '@sanity/ui'
-import {memo, type MouseEvent, type RefObject} from 'react'
-import {useDispatch} from 'react-redux'
-import {useColorSchemeValue} from 'sanity'
-import {styled, css} from 'styled-components'
-import {PANEL_HEIGHT} from '../../constants'
-import {useAssetSourceActions} from '../../contexts/AssetSourceDispatchContext'
+import { memo, type MouseEvent, type RefObject } from 'react'
+import { useDispatch } from 'react-redux'
+import { useColorSchemeValue } from 'sanity'
+import { styled, css } from 'styled-components'
+import { PANEL_HEIGHT } from '../../constants'
+import { useAssetSourceActions } from '../../contexts/AssetSourceDispatchContext'
 import useKeyPress from '../../hooks/useKeyPress'
 import useTypedSelector from '../../hooks/useTypedSelector'
-import {assetsActions, selectAssetById} from '../../modules/assets'
-import {dialogActions} from '../../modules/dialog'
+import { assetsActions, selectAssetById } from '../../modules/assets'
+import { dialogActions } from '../../modules/dialog'
 import imageDprUrl from '../../utils/imageDprUrl'
-import {isFileAsset, isImageAsset} from '../../utils/typeGuards'
+import { isFileAsset, isImageAsset } from '../../utils/typeGuards'
 import FileIcon from '../FileIcon'
 import Image from '../Image'
-import {getSchemeColor} from '../../utils/getSchemeColor'
+import { getSchemeColor } from '../../utils/getSchemeColor'
 
 type Props = {
   id: string
@@ -39,8 +39,8 @@ const CardWrapper = styled(Flex)`
   width: 100%;
 `
 
-const CardContainer = styled(Flex)<{$picked?: boolean; theme: Theme; $updating?: boolean}>(
-  ({$picked, theme, $updating}) => {
+const CardContainer = styled(Flex)<{ $picked?: boolean; theme: Theme; $updating?: boolean }>(
+  ({ $picked, theme, $updating }) => {
     return css`
       border: 1px solid transparent;
       height: 100%;
@@ -66,8 +66,8 @@ const CardContainer = styled(Flex)<{$picked?: boolean; theme: Theme; $updating?:
   }
 )
 
-const ContextActionContainer = styled<typeof Flex, {$scheme: ThemeColorSchemeKey}>(Flex)(
-  ({$scheme}) => {
+const ContextActionContainer = styled<typeof Flex, { $scheme: ThemeColorSchemeKey }>(Flex)(
+  ({ $scheme }) => {
     return css`
       cursor: pointer;
       height: ${PANEL_HEIGHT}px;
@@ -81,14 +81,14 @@ const ContextActionContainer = styled<typeof Flex, {$scheme: ThemeColorSchemeKey
   }
 )
 
-const StyledWarningOutlineIcon = styled(WarningFilledIcon)(({theme}) => {
+const StyledWarningOutlineIcon = styled(WarningFilledIcon)(({ theme }) => {
   return {
     color: theme.sanity.color.spot.red
   }
 })
 
 const CardAsset = (props: Props) => {
-  const {id, selected} = props
+  const { id, selected } = props
 
   const scheme = useColorSchemeValue()
 
@@ -106,7 +106,7 @@ const CardAsset = (props: Props) => {
   const picked = item?.picked
   const updating = item?.updating
 
-  const {onSelect} = useAssetSourceActions()
+  const { onSelect } = useAssetSourceActions()
 
   // Short circuit if no asset is available
   if (!asset) {
@@ -126,12 +126,12 @@ const CardAsset = (props: Props) => {
       ])
     } else if (shiftPressed.current) {
       if (picked) {
-        dispatch(assetsActions.pick({assetId: asset._id, picked: !picked}))
+        dispatch(assetsActions.pick({ assetId: asset._id, picked: !picked }))
       } else {
-        dispatch(assetsActions.pickRange({startId: lastPicked || asset._id, endId: asset._id}))
+        dispatch(assetsActions.pickRange({ startId: lastPicked || asset._id, endId: asset._id }))
       }
     } else {
-      dispatch(dialogActions.showAssetEdit({assetId: asset._id}))
+      dispatch(dialogActions.showAssetEdit({ assetId: asset._id }))
     }
   }
 
@@ -139,11 +139,11 @@ const CardAsset = (props: Props) => {
     e.stopPropagation()
 
     if (onSelect) {
-      dispatch(dialogActions.showAssetEdit({assetId: asset._id}))
+      dispatch(dialogActions.showAssetEdit({ assetId: asset._id }))
     } else if (shiftPressed.current && !picked) {
-      dispatch(assetsActions.pickRange({startId: lastPicked || asset._id, endId: asset._id}))
+      dispatch(assetsActions.pickRange({ startId: lastPicked || asset._id, endId: asset._id }))
     } else {
-      dispatch(assetsActions.pick({assetId: asset._id, picked: !picked}))
+      dispatch(assetsActions.pick({ assetId: asset._id, picked: !picked }))
     }
   }
 
@@ -161,7 +161,7 @@ const CardAsset = (props: Props) => {
             position: 'relative'
           }}
         >
-          <div onClick={handleAssetClick} style={{height: '100%', opacity: opacityPreview}}>
+          <div onClick={handleAssetClick} style={{ height: '100%', opacity: opacityPreview }}>
             {/* File icon */}
             {isFileAsset(asset) && <FileIcon extension={asset.extension} width="80px" />}
 
@@ -171,7 +171,7 @@ const CardAsset = (props: Props) => {
                 draggable={false}
                 $scheme={scheme}
                 $showCheckerboard={!isOpaque}
-                src={imageDprUrl(asset, {height: 250, width: 250})}
+                src={imageDprUrl(asset, { height: 250, width: 250 })}
                 style={{
                   draggable: false,
                   transition: 'opacity 1000ms'
@@ -224,7 +224,7 @@ const CardAsset = (props: Props) => {
           onClick={handleContextActionClick}
           paddingX={1}
           $scheme={scheme}
-          style={{opacity: opacityContainer}}
+          style={{ opacity: opacityContainer }}
         >
           {onSelect ? (
             <EditIcon

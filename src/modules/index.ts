@@ -4,7 +4,7 @@ import {
   type StateFromReducersMapObject,
   combineReducers
 } from '@reduxjs/toolkit'
-import {combineEpics} from 'redux-observable'
+import { combineEpics } from 'redux-observable'
 
 import assetsReducer, {
   assetsDeleteEpic,
@@ -41,7 +41,7 @@ import notificationsReducer, {
   notificationsTagDeleteCompleteEpic,
   notificationsTagUpdateCompleteEpic
 } from './notifications'
-import searchReducer, {searchFacetTagUpdateEpic} from './search'
+import searchReducer, { searchFacetTagUpdateEpic } from './search'
 import tagsReducer, {
   tagsCreateEpic,
   tagsDeleteEpic,
