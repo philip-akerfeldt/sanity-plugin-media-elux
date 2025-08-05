@@ -1,13 +1,13 @@
-import {AddIcon} from '@sanity/icons'
-import {Button, Flex, Menu, MenuButton, MenuDivider, MenuGroup, MenuItem} from '@sanity/ui'
-import type {SearchFacetDivider, SearchFacetGroup, SearchFacetInputProps} from '../../types'
+import { AddIcon } from '@sanity/icons'
+import { Button, Flex, Menu, MenuButton, MenuDivider, MenuGroup, MenuItem } from '@sanity/ui'
+import type { SearchFacetDivider, SearchFacetGroup, SearchFacetInputProps } from '../../types'
 
-import {useDispatch} from 'react-redux'
-import {FACETS} from '../../constants'
-import {usePortalPopoverProps} from '../../hooks/usePortalPopoverProps'
+import { useDispatch } from 'react-redux'
+import { FACETS } from '../../constants'
+import { usePortalPopoverProps } from '../../hooks/usePortalPopoverProps'
 import useTypedSelector from '../../hooks/useTypedSelector'
-import {searchActions} from '../../modules/search'
-import {useToolOptions} from '../../contexts/ToolOptionsContext'
+import { searchActions } from '../../modules/search'
+import { useToolOptions } from '../../contexts/ToolOptionsContext'
 
 const SearchFacetsControl = () => {
   // Redux
@@ -18,7 +18,7 @@ const SearchFacetsControl = () => {
 
   const popoverProps = usePortalPopoverProps()
 
-  const {creditLine} = useToolOptions()
+  const { creditLine } = useToolOptions()
 
   const isTool = !selectedDocument
 
@@ -87,7 +87,7 @@ const SearchFacetsControl = () => {
                 disabled={disabled}
                 fontSize={1}
                 key={facet.name}
-                onClick={() => dispatch(searchActions.facetsAdd({facet}))}
+                onClick={() => dispatch(searchActions.facetsAdd({ facet }))}
                 padding={2}
                 text={facet.title}
               />
