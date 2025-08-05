@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Box, Button, Card, Flex, Stack, Tab, TabList, TabPanel, Text } from '@sanity/ui'
 
 import { useToolOptions } from '../../contexts/ToolOptionsContext'
-import { assetFormSchema } from '../../formSchema'
+import { createAssetFormSchema } from '../../formSchema'
 import useTypedSelector from '../../hooks/useTypedSelector'
 import useVersionedClient from '../../hooks/useVersionedClient'
 import { assetsActions, selectAssetById } from '../../modules/assets'
@@ -30,7 +30,10 @@ import FormSubmitButton from '../FormSubmitButton'
 import Image from '../Image'
 
 import type { MutationEvent } from '@sanity/client'
-import type { Asset, AssetFormData, DialogAssetEditProps, TagSelectOption } from '../../types'
+import type { Asset, DialogAssetEditProps, TagSelectOption } from '../../types'
+import { WarningOutlineIcon } from '@sanity/icons'
+import type { z } from 'zod'
+
 type Props = {
   children: ReactNode
   dialog: DialogAssetEditProps
@@ -55,7 +58,7 @@ const DialogAssetEdit = (props: Props) => {
 
   // Generate a snapshot of the current asset
   const [assetSnapshot, setAssetSnapshot] = useState(assetItem?.asset)
-  const [tabSection, setTabSection] = useState<'details' | 'references'>('details')
+  const [tabSection, setTabSection] = useState<'details' | 'altTexts' | 'references'>('details')
 
   const currentAsset = assetItem ? assetItem?.asset : assetSnapshot
   const allTagOptions = getTagSelectOptions(tags)
@@ -64,6 +67,10 @@ const DialogAssetEdit = (props: Props) => {
 
   // Check if credit line options are configured
   const { creditLine, languages } = useToolOptions()
+
+  const assetFormSchema = createAssetFormSchema(languages)
+
+  type AssetFormData = z.infer<typeof assetFormSchema>
 
   const generateDefaultValues = useCallback(
     (asset?: Asset): AssetFormData => {
@@ -87,12 +94,21 @@ const DialogAssetEdit = (props: Props) => {
     handleSubmit,
     register,
     reset,
-    setValue
+    setValue,
+    trigger
   } = useForm<AssetFormData>({
     defaultValues: generateDefaultValues(assetItem?.asset),
-    mode: 'onChange',
+    mode: 'all',
     resolver: zodResolver(assetFormSchema)
   })
+
+  useEffect(() => {
+    trigger()
+  }, [trigger])
+
+  const altTextsError = (errors?.altTexts?.root?.message || errors?.altTexts?.message) as
+    | string
+    | undefined
 
   const formUpdating = !assetItem || assetItem?.updating
 
@@ -274,6 +290,17 @@ const DialogAssetEdit = (props: Props) => {
                       size={2}
                     />
                     <Tab
+                      aria-controls="altTexts-panel"
+                      disabled={formUpdating}
+                      id="altTexts-tab"
+                      label="Alt Texts"
+                      onClick={() => setTabSection('altTexts')}
+                      selected={tabSection === 'altTexts'}
+                      tone={errors?.altTexts ? 'critical' : undefined}
+                      icon={errors?.altTexts ? WarningOutlineIcon : undefined}
+                      size={2}
+                    />
+                    <Tab
                       aria-controls="references-panel"
                       disabled={formUpdating}
                       id="references-tab"
@@ -337,28 +364,17 @@ const DialogAssetEdit = (props: Props) => {
                           name="title"
                           value={currentAsset?.title}
                         />
-                        {/* Alt text */}
-                        {/* <FormFieldInputText
+                        {/* !! DEPRECATED !! - Alt text */}
+                        <FormFieldInputText
                           {...register('altText')}
-                          disabled={formUpdating}
+                          icon={WarningOutlineIcon}
+                          disabled
                           error={errors?.altText?.message}
+                          description='This field is deprecated. Use "Alt Texts" tab instead.'
                           label="Alt Text"
                           name="altText"
                           value={currentAsset?.altText}
-                        /> */}
-                        <Stack space={2}>
-                          {languages.map(language => (
-                            <FormFieldInputText
-                              key={language.code}
-                              {...register(`altTexts.${language.code}`)}
-                              disabled={formUpdating}
-                              error={errors?.altTexts?.[language.code]?.message}
-                              label={`Alt text (${language.code})`}
-                              name={`altTexts.${language.code}`}
-                              value={currentAsset?.altTexts?.[language.code] || ''}
-                            />
-                          ))}
-                        </Stack>
+                        />
                         {/* Description */}
                         <FormFieldInputTextarea
                           {...register('description')}
@@ -385,7 +401,43 @@ const DialogAssetEdit = (props: Props) => {
                         )}
                       </Stack>
                     </TabPanel>
-
+                    {/* Panel: Alt texts */}
+                    <TabPanel
+                      aria-labelledby="altTexts"
+                      hidden={tabSection !== 'altTexts'}
+                      id="alt-texts"
+                    >
+                      {altTextsError && (
+                        <Stack marginBottom={3}>
+                          <Card padding={[3, 3, 4]} radius={2} shadow={1} tone="critical">
+                            <Text size={1}>{altTextsError}</Text>
+                          </Card>
+                        </Stack>
+                      )}
+                      <Stack space={2} style={{ height: '50dvh', overflowY: 'auto' }}>
+                        {languages.map(language => {
+                          const label = language.default
+                            ? `${language.label} (Default)`
+                            : language.label
+                          return (
+                            <FormFieldInputText
+                              key={language.code}
+                              {...register(`altTexts.${language.code}`, {
+                                onChange: () => {
+                                  setTimeout(() => trigger('altTexts'), 0)
+                                }
+                              })}
+                              disabled={formUpdating}
+                              error={errors?.altTexts?.[language.code]?.message}
+                              label={label}
+                              description={language.code}
+                              name={`altTexts.${language.code}`}
+                              value={currentAsset?.altTexts?.[language.code] || ''}
+                            />
+                          )
+                        })}
+                      </Stack>
+                    </TabPanel>
                     {/* Panel: References */}
                     <TabPanel
                       aria-labelledby="references"

@@ -30,7 +30,7 @@ export const createAssetFormSchema = (languages: MediaToolOptions['languages']) 
       },
       {
         message:
-          'The default language must have alt text. Please fill in the default language and click "Save and close".'
+          'The default language must have alt text. Please fill in the default language field and click "Save and close".'
       }
     ),
     creditLine: z.string().trim().optional(),
