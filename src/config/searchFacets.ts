@@ -9,13 +9,13 @@ import groq from 'groq'
 export const divider: SearchFacetDivider = { type: 'divider' }
 
 export const inputs: Record<SearchFacetName, SearchFacetInputProps> = {
-  altText: {
+  altTexts: {
     assetTypes: ['file', 'image'],
-    field: 'altText',
-    name: 'altText',
+    field: 'altTexts',
+    name: 'altTexts',
     operatorType: 'empty',
     operatorTypes: ['empty', 'notEmpty', null, 'includes', 'doesNotInclude'],
-    title: 'Alt text',
+    title: 'Alt texts',
     type: 'string',
     value: ''
   },
