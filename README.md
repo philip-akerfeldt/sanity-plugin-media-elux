@@ -1,7 +1,7 @@
 # Sanity Media Plugin - Electrolux Version (for Sanity Studio v3)
 
 > This plugin is for **Sanity Studio v3**.  
-> The Sanity Studio v2 version of this plugin is no longer maintained, but still accessible on the [v2 branch](https://github.com/sanity-io/sanity-plugin-media/tree/studio-v2).
+> This is a forked version of Sanitys own [Media Plugin (v4.0.0)](https://github.com/sanity-io/sanity-plugin-media)
 
 ## What is it?
 
@@ -12,15 +12,18 @@ Use it standalone as a browser, or optionally hook it up as a [custom asset sour
 ![Grid view](https://user-images.githubusercontent.com/209129/108927411-21aa7f00-7638-11eb-9cf7-334598ac4103.png)
 _Default grid view_
 
-![Asset view](https://user-images.githubusercontent.com/209129/132573482-fa866da9-7ee0-42db-b39f-25a0e48bba9f.png)
-_Individual asset view_
+
+_Asset details tab_          |  _Asset alt texts tab_
+:-------------------------:|:-------------------------:
+![first](https://private-user-images.githubusercontent.com/5981206/474436776-a6623072-00f4-4299-bba4-03db5fe708d0.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTQzOTM0NjYsIm5iZiI6MTc1NDM5MzE2NiwicGF0aCI6Ii81OTgxMjA2LzQ3NDQzNjc3Ni1hNjYyMzA3Mi0wMGY0LTQyOTktYmJhNC0wM2RiNWZlNzA4ZDAucG5nP1gtQW16LUFsZ29yaXRobT1BV1M0LUhNQUMtU0hBMjU2JlgtQW16LUNyZWRlbnRpYWw9QUtJQVZDT0RZTFNBNTNQUUs0WkElMkYyMDI1MDgwNSUyRnVzLWVhc3QtMSUyRnMzJTJGYXdzNF9yZXF1ZXN0JlgtQW16LURhdGU9MjAyNTA4MDVUMTEyNjA2WiZYLUFtei1FeHBpcmVzPTMwMCZYLUFtei1TaWduYXR1cmU9ZDdhMzZmMTA3ZmYzNGQwOTYzYWMzOWNiZWNiNDI0ZDFjMmI4Y2EyZTZmOGMwZGYzZTM5MGUyZmEwM2Q2OGQzMyZYLUFtei1TaWduZWRIZWFkZXJzPWhvc3QifQ.iPGMn1m_0w0xq58PyPcr_gaagfpd3GNulKVrPYMZ9KI)  |  ![second](https://private-user-images.githubusercontent.com/5981206/474436765-f3f1f586-8f6f-465f-b7fa-2b6248ca5897.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTQzOTM0NjYsIm5iZiI6MTc1NDM5MzE2NiwicGF0aCI6Ii81OTgxMjA2LzQ3NDQzNjc2NS1mM2YxZjU4Ni04ZjZmLTQ2NWYtYjdmYS0yYjYyNDhjYTU4OTcucG5nP1gtQW16LUFsZ29yaXRobT1BV1M0LUhNQUMtU0hBMjU2JlgtQW16LUNyZWRlbnRpYWw9QUtJQVZDT0RZTFNBNTNQUUs0WkElMkYyMDI1MDgwNSUyRnVzLWVhc3QtMSUyRnMzJTJGYXdzNF9yZXF1ZXN0JlgtQW16LURhdGU9MjAyNTA4MDVUMTEyNjA2WiZYLUFtei1FeHBpcmVzPTMwMCZYLUFtei1TaWduYXR1cmU9MmQxMDJkOGEwNjUzMGExMWU1NzhlZjYyNGJhNTY1Mzc2YTc3OTM2NWQ2NGRhMTM5ZTFhY2U3NjM0NTRmMzc1MyZYLUFtei1TaWduZWRIZWFkZXJzPWhvc3QifQ.Z3JLgjGH8FUU3CnpH0JncDnGkwcFFV7s9EfBMoLgbIk)
+
 
 ## Features
 
 #### Manage and organise your assets
 
 - Support for batch uploads with drag and drop support
-- Edit text fields native to Sanity's asset documents, such as `title`, `description`, `altText` and `originalFilename`
+- Edit text fields native to Sanity's asset documents, such as `title`, `description`, `altTexts` and `originalFilename`
 - View asset metadata and a limited subset of EXIF data, if present
 - Tag your assets individually or in bulk
 - Manage tags directly within the plugin
@@ -41,6 +44,11 @@ _Individual asset view_
 
 - Built with the same [UI components Sanity uses](https://www.sanity.io/ui) under the hood
 - Fully responsive and mobile friendly
+
+#### Added support for multi-language alt texts
+
+- Define a list of available languages to enable multi-language alt texts for assets.
+- See example of how to enable this feature [here](###plugin-config).
 
 ## Install (Sanity Studio v3)
 
@@ -100,10 +108,11 @@ export default defineConfig({
   //...
   plugins: [
     media({
-      // { code: string; label: string }[] - the list of languages used for alt texts
+      // { code: string; label: string, default?: boolean }[] - the list of languages used for alt texts
+      // NOTE! Set only one language to default: true. 
       languages: [
+        { code: 'en-US', label: 'English', default: true },
         { code: 'sv-SE', label: 'Swedish' },
-        { code: 'en-US', label: 'English' },
         { code: 'fr-FR', label: 'French' },
         { code: 'de-DE', label: 'German' }
       ],
