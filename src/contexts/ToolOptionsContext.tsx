@@ -30,7 +30,10 @@ export const ToolOptionsProvider = ({ options, children }: PropsWithChildren<Pro
         enabled: options?.creditLine?.enabled || false,
         excludeSources: creditLineExcludeSources
       },
-      languages: options?.languages || []
+      languages:
+        options?.languages.sort((a, b) => {
+          return (b.default ? 1 : 0) - (a.default ? 1 : 0)
+        }) || []
     }
   }, [
     options?.creditLine?.enabled,

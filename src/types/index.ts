@@ -8,12 +8,12 @@ import type {
 import type { Epic } from 'redux-observable'
 import * as z from 'zod'
 
-import { assetFormSchema, tagFormSchema, tagOptionSchema } from '../formSchema'
+import { tagFormSchema, tagOptionSchema } from '../formSchema'
 
 import type { RootReducerState } from '../modules/types'
 
 export type MediaToolOptions = {
-  languages: { code: string; label: string }[]
+  languages: { code: string; label: string; default?: boolean }[]
   maximumUploadSize?: number
   creditLine: {
     enabled: boolean
@@ -43,8 +43,6 @@ type SearchFacetInputCommon = {
 }
 
 export type Asset = FileAsset | ImageAsset
-
-export type AssetFormData = z.infer<typeof assetFormSchema>
 
 export type AssetItem = {
   _type: 'asset'
@@ -246,7 +244,7 @@ export type SearchFacetInputStringProps = SearchFacetInputCommon & {
 }
 
 export type SearchFacetName =
-  | 'altText'
+  | 'altTexts'
   | 'creditLine'
   | 'description'
   | 'fileName'
