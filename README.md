@@ -5,6 +5,8 @@
 
 ## What is it?
 
+A Sanity Studio v3 plugin that extends media handling capabilities with custom enhancements, based on a fork of an original plugin by Sanity.io.
+
 A convenient way to browse, manage and refine your [Sanity](https://www.sanity.io/) assets.
 
 Use it standalone as a browser, or optionally hook it up as a [custom asset source](https://www.sanity.io/docs/custom-asset-sources) and use it to power both image and file selection too.
@@ -73,7 +75,16 @@ import {media} from 'sanity-plugin-media'
 
 export default defineConfig({
   // ...
-  plugins: [media()]
+  plugins: [
+    media(      
+      languages: [
+        { code: 'en-US', label: 'English', default: true },
+        { code: 'sv-SE', label: 'Swedish' },
+        { code: 'fr-FR', label: 'French' },
+        { code: 'de-DE', label: 'German' }
+      ],
+    )
+  ]
 })
 ```
 

@@ -36,7 +36,8 @@
   "files": [
     "dist",
     "sanity.json",
-    "src"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "plugin-kit verify-package --silent && pkg-utils build --strict --check --clean",
@@ -45,10 +46,12 @@
     "format": "prettier --write --cache --ignore-unknown .",
     "link-watch": "plugin-kit link-watch",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "prepare": "husky install",
     "prepublishOnly": "npm run build",
     "watch": "pkg-utils watch --strict"
   },
+  "browserslist": "extends @sanity/browserslist-config",
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
     "@reduxjs/toolkit": "^2.6.0",
@@ -115,7 +118,7 @@
     "react": "^18.3 || ^19",
     "react-dom": "^18.3 || ^19",
     "react-is": "^18.3 || ^19",
-    "sanity": "^3.78 || ^4.0.0-0",
+    "sanity": "^3.78 || ^4.0.0",
     "styled-components": "^6.1"
   },
   "engines": {
