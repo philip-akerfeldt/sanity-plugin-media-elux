@@ -1,13 +1,13 @@
-import {zodResolver} from '@hookform/resolvers/zod'
-import {Box, Flex} from '@sanity/ui'
-import type {DialogTagCreateProps, TagFormData} from '../../types'
-import {type ReactNode, useEffect} from 'react'
-import {type SubmitHandler, useForm} from 'react-hook-form'
-import {useDispatch} from 'react-redux'
-import {tagFormSchema} from '../../formSchema'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Box, Flex } from '@sanity/ui'
+import type { DialogTagCreateProps, TagFormData } from '../../types'
+import { type ReactNode, useEffect } from 'react'
+import { type SubmitHandler, useForm } from 'react-hook-form'
+import { useDispatch } from 'react-redux'
+import { tagFormSchema } from '../../formSchema'
 import useTypedSelector from '../../hooks/useTypedSelector'
-import {dialogActions} from '../../modules/dialog'
-import {tagsActions} from '../../modules/tags'
+import { dialogActions } from '../../modules/dialog'
+import { tagsActions } from '../../modules/tags'
 import sanitizeFormData from '../../utils/sanitizeFormData'
 import Dialog from '../Dialog'
 import FormFieldInputText from '../FormFieldInputText'
@@ -21,7 +21,7 @@ type Props = {
 const DialogTagCreate = (props: Props) => {
   const {
     children,
-    dialog: {id}
+    dialog: { id }
   } = props
 
   const dispatch = useDispatch()
@@ -31,7 +31,7 @@ const DialogTagCreate = (props: Props) => {
 
   const {
     // Read the formState before render to subscribe the form state through Proxy
-    formState: {errors, isDirty, isValid},
+    formState: { errors, isDirty, isValid },
     handleSubmit,
     register,
     setError
@@ -53,7 +53,7 @@ const DialogTagCreate = (props: Props) => {
   const onSubmit: SubmitHandler<TagFormData> = formData => {
     const sanitizedFormData = sanitizeFormData(formData)
 
-    dispatch(tagsActions.createRequest({name: sanitizedFormData.name}))
+    dispatch(tagsActions.createRequest({ name: sanitizedFormData.name }))
   }
 
   useEffect(() => {
@@ -82,7 +82,7 @@ const DialogTagCreate = (props: Props) => {
       {/* Form fields */}
       <Box as="form" padding={4} onSubmit={handleSubmit(onSubmit)}>
         {/* Hidden button to enable enter key submissions */}
-        <button style={{display: 'none'}} tabIndex={-1} type="submit" />
+        <button style={{ display: 'none' }} tabIndex={-1} type="submit" />
 
         {/* Title */}
         <FormFieldInputText

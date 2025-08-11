@@ -1,5 +1,5 @@
-import {SelectIcon} from '@sanity/icons'
-import {Box, Button, Menu, MenuButton, MenuDivider, MenuItem} from '@sanity/ui'
+import { SelectIcon } from '@sanity/icons'
+import { Box, Button, Menu, MenuButton, MenuDivider, MenuItem } from '@sanity/ui'
 import type {
   SearchFacetInputNumberModifier,
   SearchFacetInputNumberProps,
@@ -7,10 +7,10 @@ import type {
   WithId
 } from '../../types'
 
-import {useDispatch} from 'react-redux'
-import {operators} from '../../config/searchFacets'
-import {usePortalPopoverProps} from '../../hooks/usePortalPopoverProps'
-import {searchActions} from '../../modules/search'
+import { useDispatch } from 'react-redux'
+import { operators } from '../../config/searchFacets'
+import { usePortalPopoverProps } from '../../hooks/usePortalPopoverProps'
+import { searchActions } from '../../modules/search'
 import SearchFacet from '../SearchFacet'
 import TextInputNumber from '../TextInputNumber'
 
@@ -18,7 +18,7 @@ type Props = {
   facet: WithId<SearchFacetInputNumberProps>
 }
 
-const SearchFacetNumber = ({facet}: Props) => {
+const SearchFacetNumber = ({ facet }: Props) => {
   // Redux
   const dispatch = useDispatch()
 
@@ -30,15 +30,15 @@ const SearchFacetNumber = ({facet}: Props) => {
     : modifiers?.[0]
 
   const handleOperatorItemClick = (operatorType: SearchFacetOperatorType) => {
-    dispatch(searchActions.facetsUpdateById({id: facet.id, operatorType}))
+    dispatch(searchActions.facetsUpdateById({ id: facet.id, operatorType }))
   }
 
   const handleModifierClick = (modifier: SearchFacetInputNumberModifier) => {
-    dispatch(searchActions.facetsUpdateById({id: facet.id, modifier: modifier.name}))
+    dispatch(searchActions.facetsUpdateById({ id: facet.id, modifier: modifier.name }))
   }
 
   const handleValueChange = (value: number) => {
-    dispatch(searchActions.facetsUpdateById({id: facet.id, value}))
+    dispatch(searchActions.facetsUpdateById({ id: facet.id, value }))
   }
 
   const selectedOperatorType: SearchFacetOperatorType = facet.operatorType ?? 'greaterThan'
@@ -83,7 +83,7 @@ const SearchFacetNumber = ({facet}: Props) => {
       )}
 
       {/* Value */}
-      <Box marginX={1} style={{maxWidth: '50px'}}>
+      <Box marginX={1} style={{ maxWidth: '50px' }}>
         <TextInputNumber
           fontSize={1}
           onValueChange={handleValueChange}

@@ -1,5 +1,5 @@
-import {Box, TextArea} from '@sanity/ui'
-import {forwardRef} from 'react'
+import { Box, TextArea } from '@sanity/ui'
+import { forwardRef } from 'react'
 
 import FormFieldInputLabel from '../FormFieldInputLabel'
 
@@ -17,7 +17,7 @@ type Props = {
 type Ref = HTMLTextAreaElement
 
 const FormFieldInputTextarea = forwardRef<Ref, Props>((props: Props, ref) => {
-  const {description, disabled, error, label, name, placeholder, rows, value, ...rest} = props
+  const { description, disabled, error, label, name, placeholder, rows, value, ...rest } = props
 
   return (
     <Box>

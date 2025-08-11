@@ -1,16 +1,23 @@
-import {ArrowDownIcon, ArrowUpIcon, CloseIcon, EditIcon, SearchIcon, TrashIcon} from '@sanity/icons'
-import {Box, Button, Container, Flex, Text, Tooltip} from '@sanity/ui'
-import type {SearchFacetInputSearchableProps, TagActions, TagItem} from '../../types'
-import {type ReactNode} from 'react'
-import {useDispatch} from 'react-redux'
-import {styled} from 'styled-components'
-import {inputs} from '../../config/searchFacets'
-import {PANEL_HEIGHT} from '../../constants'
+import {
+  ArrowDownIcon,
+  ArrowUpIcon,
+  CloseIcon,
+  EditIcon,
+  SearchIcon,
+  TrashIcon
+} from '@sanity/icons'
+import { Box, Button, Container, Flex, Text, Tooltip } from '@sanity/ui'
+import type { SearchFacetInputSearchableProps, TagActions, TagItem } from '../../types'
+import { type ReactNode } from 'react'
+import { useDispatch } from 'react-redux'
+import { styled } from 'styled-components'
+import { inputs } from '../../config/searchFacets'
+import { PANEL_HEIGHT } from '../../constants'
 import useTypedSelector from '../../hooks/useTypedSelector'
-import {selectAssetsPicked} from '../../modules/assets'
-import {dialogActions} from '../../modules/dialog'
-import {DIALOG_ACTIONS} from '../../modules/dialog/actions'
-import {searchActions, selectIsSearchFacetTag} from '../../modules/search'
+import { selectAssetsPicked } from '../../modules/assets'
+import { dialogActions } from '../../modules/dialog'
+import { DIALOG_ACTIONS } from '../../modules/dialog/actions'
+import { searchActions, selectIsSearchFacetTag } from '../../modules/search'
 
 type Props = {
   actions?: TagActions[]
@@ -42,7 +49,7 @@ type TagButtonProps = {
 }
 
 const TagButton = (props: TagButtonProps) => {
-  const {disabled, icon, onClick, tone, tooltip} = props
+  const { disabled, icon, onClick, tone, tooltip } = props
 
   return (
     <Tooltip
@@ -72,7 +79,7 @@ const TagButton = (props: TagButtonProps) => {
 }
 
 const Tag = (props: Props) => {
-  const {actions, tag} = props
+  const { actions, tag } = props
 
   // Redux
   const dispatch = useDispatch()
@@ -81,23 +88,23 @@ const Tag = (props: Props) => {
 
   // Callbacks
   const handleSearchFacetTagRemove = () => {
-    dispatch(searchActions.facetsRemoveByTag({tagId: tag.tag._id}))
+    dispatch(searchActions.facetsRemoveByTag({ tagId: tag.tag._id }))
   }
 
   const handleShowAddTagToAssetsDialog = () => {
-    dispatch(dialogActions.showConfirmAssetsTagAdd({assetsPicked, tag: tag.tag}))
+    dispatch(dialogActions.showConfirmAssetsTagAdd({ assetsPicked, tag: tag.tag }))
   }
 
   const handleShowRemoveTagFromAssetsDialog = () => {
-    dispatch(dialogActions.showConfirmAssetsTagRemove({assetsPicked, tag: tag.tag}))
+    dispatch(dialogActions.showConfirmAssetsTagRemove({ assetsPicked, tag: tag.tag }))
   }
 
   const handleShowTagDeleteDialog = () => {
-    dispatch(dialogActions.showConfirmDeleteTag({tag: tag.tag}))
+    dispatch(dialogActions.showConfirmDeleteTag({ tag: tag.tag }))
   }
 
   const handleShowTagEditDialog = () => {
-    dispatch(DIALOG_ACTIONS.showTagEdit({tagId: tag?.tag?._id}))
+    dispatch(DIALOG_ACTIONS.showTagEdit({ tagId: tag?.tag?._id }))
   }
 
   const handleSearchFacetTagAddOrUpdate = () => {
@@ -118,7 +125,7 @@ const Tag = (props: Props) => {
         })
       )
     } else {
-      dispatch(searchActions.facetsAdd({facet: searchFacet}))
+      dispatch(searchActions.facetsAdd({ facet: searchFacet }))
     }
   }
 
@@ -138,7 +145,7 @@ const Tag = (props: Props) => {
         </Text>
       </Box>
 
-      <ButtonContainer align="center" style={{flexShrink: 0}}>
+      <ButtonContainer align="center" style={{ flexShrink: 0 }}>
         {/* Search facet toggle */}
         {actions?.includes('search') && (
           <TagButton

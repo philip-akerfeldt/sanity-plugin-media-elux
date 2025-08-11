@@ -1,20 +1,20 @@
-import {SelectIcon} from '@sanity/icons'
-import {Box, Button, Menu, MenuButton, MenuDivider, MenuItem} from '@sanity/ui'
+import { SelectIcon } from '@sanity/icons'
+import { Box, Button, Menu, MenuButton, MenuDivider, MenuItem } from '@sanity/ui'
 import type {
   TagSelectOption,
   SearchFacetInputSearchableProps,
   SearchFacetOperatorType,
   WithId
 } from '../../types'
-import {useDispatch} from 'react-redux'
+import { useDispatch } from 'react-redux'
 import Select from 'react-select'
-import {useColorSchemeValue} from 'sanity'
-import {operators} from '../../config/searchFacets'
-import {usePortalPopoverProps} from '../../hooks/usePortalPopoverProps'
+import { useColorSchemeValue } from 'sanity'
+import { operators } from '../../config/searchFacets'
+import { usePortalPopoverProps } from '../../hooks/usePortalPopoverProps'
 import useTypedSelector from '../../hooks/useTypedSelector'
-import {searchActions} from '../../modules/search'
-import {selectTags} from '../../modules/tags'
-import {reactSelectComponents, reactSelectStyles} from '../../styled/react-select/single'
+import { searchActions } from '../../modules/search'
+import { selectTags } from '../../modules/tags'
+import { reactSelectComponents, reactSelectStyles } from '../../styled/react-select/single'
 import getTagSelectOptions from '../../utils/getTagSelectOptions'
 import SearchFacet from '../SearchFacet'
 
@@ -22,7 +22,7 @@ type Props = {
   facet: WithId<SearchFacetInputSearchableProps>
 }
 
-const SearchFacetTags = ({facet}: Props) => {
+const SearchFacetTags = ({ facet }: Props) => {
   const scheme = useColorSchemeValue()
 
   // Redux
@@ -80,7 +80,7 @@ const SearchFacetTags = ({facet}: Props) => {
                       onClick={() => handleOperatorItemClick(operatorType)}
                       padding={2}
                       space={4}
-                      style={{minWidth: '150px'}}
+                      style={{ minWidth: '150px' }}
                       text={operators[operatorType].label}
                     />
                   )
@@ -96,7 +96,7 @@ const SearchFacetTags = ({facet}: Props) => {
 
       {/* Value */}
       {!operators[selectedOperatorType].hideInput && (
-        <Box marginX={1} style={{width: '160px'}}>
+        <Box marginX={1} style={{ width: '160px' }}>
           <Select
             components={reactSelectComponents}
             instanceId="facet-searchable"

@@ -1,11 +1,11 @@
-import {DownloadIcon} from '@sanity/icons'
-import {Box, Button, Flex, Inline, Stack, Text} from '@sanity/ui'
-import type {Asset, AssetItem} from '../../types'
+import { DownloadIcon } from '@sanity/icons'
+import { Box, Button, Flex, Inline, Stack, Text } from '@sanity/ui'
+import type { Asset, AssetItem } from '../../types'
 import format from 'date-fns/format'
 import filesize from 'filesize'
-import {type ReactNode} from 'react'
+import { type ReactNode } from 'react'
 import getAssetResolution from '../../utils/getAssetResolution'
-import {isImageAsset} from '../../utils/typeGuards'
+import { isImageAsset } from '../../utils/typeGuards'
 import ButtonAssetCopy from '../ButtonAssetCopy'
 
 type Props = {
@@ -13,7 +13,7 @@ type Props = {
   item?: AssetItem
 }
 
-const Row = ({label, value}: {label: string; value: ReactNode}) => {
+const Row = ({ label, value }: { label: string; value: ReactNode }) => {
   return (
     <Flex justify="space-between">
       <Text
@@ -42,7 +42,7 @@ const Row = ({label, value}: {label: string; value: ReactNode}) => {
 }
 
 const AssetMetadata = (props: Props) => {
-  const {asset, item} = props
+  const { asset, item } = props
 
   const exif = asset?.metadata?.exif
 
@@ -56,7 +56,7 @@ const AssetMetadata = (props: Props) => {
       {/* Base */}
       <Box>
         <Stack space={3}>
-          <Row label="Size" value={filesize(asset?.size, {base: 10, round: 0})} />
+          <Row label="Size" value={filesize(asset?.size, { base: 10, round: 0 })} />
           <Row label="MIME type" value={asset?.mimeType} />
           <Row label="Extension" value={(asset?.extension).toUpperCase()} />
           {isImageAsset(asset) && <Row label="Dimensions" value={getAssetResolution(asset)} />}

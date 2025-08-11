@@ -13,7 +13,7 @@ import { tagFormSchema, tagOptionSchema } from '../formSchema'
 import type { RootReducerState } from '../modules/types'
 
 export type MediaToolOptions = {
-  languages: { code: string; label: string; default?: boolean }[]
+  languages: { code: string; title: string; default?: boolean }[]
   maximumUploadSize?: number
   creditLine: {
     enabled: boolean

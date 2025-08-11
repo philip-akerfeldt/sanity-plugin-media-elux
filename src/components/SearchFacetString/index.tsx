@@ -1,30 +1,30 @@
-import {SelectIcon} from '@sanity/icons'
-import {Box, Button, Menu, MenuButton, MenuDivider, MenuItem, TextInput} from '@sanity/ui'
-import type {SearchFacetInputStringProps, SearchFacetOperatorType, WithId} from '../../types'
-import {type ChangeEvent} from 'react'
-import {useDispatch} from 'react-redux'
+import { SelectIcon } from '@sanity/icons'
+import { Box, Button, Menu, MenuButton, MenuDivider, MenuItem, TextInput } from '@sanity/ui'
+import type { SearchFacetInputStringProps, SearchFacetOperatorType, WithId } from '../../types'
+import { type ChangeEvent } from 'react'
+import { useDispatch } from 'react-redux'
 
-import {operators} from '../../config/searchFacets'
-import {usePortalPopoverProps} from '../../hooks/usePortalPopoverProps'
-import {searchActions} from '../../modules/search'
+import { operators } from '../../config/searchFacets'
+import { usePortalPopoverProps } from '../../hooks/usePortalPopoverProps'
+import { searchActions } from '../../modules/search'
 import SearchFacet from '../SearchFacet'
 
 type Props = {
   facet: WithId<SearchFacetInputStringProps>
 }
 
-const SearchFacetString = ({facet}: Props) => {
+const SearchFacetString = ({ facet }: Props) => {
   // Redux
   const dispatch = useDispatch()
 
   const popoverProps = usePortalPopoverProps()
 
   const handleOperatorItemClick = (operatorType: SearchFacetOperatorType) => {
-    dispatch(searchActions.facetsUpdateById({id: facet.id, operatorType}))
+    dispatch(searchActions.facetsUpdateById({ id: facet.id, operatorType }))
   }
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    dispatch(searchActions.facetsUpdateById({id: facet.id, value: e.target.value}))
+    dispatch(searchActions.facetsUpdateById({ id: facet.id, value: e.target.value }))
   }
 
   const selectedOperatorType: SearchFacetOperatorType = facet.operatorType
@@ -70,7 +70,7 @@ const SearchFacetString = ({facet}: Props) => {
 
       {/* Value */}
       {!operators[selectedOperatorType].hideInput && (
-        <Box marginLeft={1} style={{maxWidth: '125px'}}>
+        <Box marginLeft={1} style={{ maxWidth: '125px' }}>
           <TextInput
             fontSize={1}
             onChange={handleChange}

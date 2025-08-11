@@ -417,8 +417,8 @@ const DialogAssetEdit = (props: Props) => {
                       <Stack space={2} style={{ height: '50dvh', overflowY: 'auto' }}>
                         {languages.map(language => {
                           const label = language.default
-                            ? `${language.label} (Default)`
-                            : language.label
+                            ? `${language.title} (Default)`
+                            : language.title
                           return (
                             <FormFieldInputText
                               key={language.code}

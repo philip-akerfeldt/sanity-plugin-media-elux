@@ -78,10 +78,10 @@ export default defineConfig({
   plugins: [
     media(      
       languages: [
-        { code: 'en-US', label: 'English', default: true },
-        { code: 'sv-SE', label: 'Swedish' },
-        { code: 'fr-FR', label: 'French' },
-        { code: 'de-DE', label: 'German' }
+        { code: 'en-US', title: 'English', default: true },
+        { code: 'sv-SE', title: 'Swedish' },
+        { code: 'fr-FR', title: 'French' },
+        { code: 'de-DE', title: 'German' }
       ],
     )
   ]
@@ -119,13 +119,13 @@ export default defineConfig({
   //...
   plugins: [
     media({
-      // { code: string; label: string, default?: boolean }[] - the list of languages used for alt texts
+      // { code: string; title: string, default?: boolean }[] - the list of languages used for alt texts
       // NOTE! Set only one language to default: true. 
       languages: [
-        { code: 'en-US', label: 'English', default: true },
-        { code: 'sv-SE', label: 'Swedish' },
-        { code: 'fr-FR', label: 'French' },
-        { code: 'de-DE', label: 'German' }
+        { code: 'en-US', title: 'English', default: true },
+        { code: 'sv-SE', title: 'Swedish' },
+        { code: 'fr-FR', title: 'French' },
+        { code: 'de-DE', title: 'German' }
       ],
       creditLine: {
         enabled: true,
