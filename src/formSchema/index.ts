@@ -11,19 +11,23 @@ export const tagFormSchema = z.object({
 })
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const createAssetFormSchema = (languages: MediaToolOptions['languages']) => {
+export const createAssetFormSchema = (
+  languages: MediaToolOptions['languages'],
+  validateAltTexts: boolean = false
+) => {
   const defaultLanguage = languages.find(lang => lang.default)
 
-  return z.object({
-    altText: z.string().trim().optional(),
-    altTexts: z.record(z.string().nullable()).refine(
+  const createAltTextsSchema = () => {
+    const baseSchema = z.record(z.string().nullable())
+
+    if (!validateAltTexts) return baseSchema
+
+    return baseSchema.refine(
       altTexts => {
-        // Check if default language has alt text
         if (defaultLanguage) {
           const defaultText = altTexts[defaultLanguage.code]
           return defaultText !== null && defaultText !== undefined && defaultText.trim().length > 0
         }
-        // Fallback: at least one language should have alt text
         return Object.values(altTexts).some(
           text => text !== null && text !== undefined && text.trim().length > 0
         )
@@ -32,7 +36,12 @@ export const createAssetFormSchema = (languages: MediaToolOptions['languages']) 
         message:
           'The default language must have alt text. Please fill in the default language field and click "Save and close".'
       }
-    ),
+    )
+  }
+
+  return z.object({
+    altText: z.string().trim().optional(),
+    altTexts: createAltTextsSchema(),
     creditLine: z.string().trim().optional(),
     description: z.string().trim().optional(),
     opt: z.object({

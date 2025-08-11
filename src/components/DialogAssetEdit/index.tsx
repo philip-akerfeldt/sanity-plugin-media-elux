@@ -63,12 +63,14 @@ const DialogAssetEdit = (props: Props) => {
   const currentAsset = assetItem ? assetItem?.asset : assetSnapshot
   const allTagOptions = getTagSelectOptions(tags)
 
+  const shouldValidateAltTexts = currentAsset ? isImageAsset(currentAsset) : false
+
   const assetTagOptions = useTypedSelector(selectTagSelectOptions(currentAsset))
 
   // Check if credit line options are configured
   const { creditLine, languages } = useToolOptions()
 
-  const assetFormSchema = createAssetFormSchema(languages)
+  const assetFormSchema = createAssetFormSchema(languages, shouldValidateAltTexts)
 
   type AssetFormData = z.infer<typeof assetFormSchema>
 
@@ -289,17 +291,19 @@ const DialogAssetEdit = (props: Props) => {
                       selected={tabSection === 'details'}
                       size={2}
                     />
-                    <Tab
-                      aria-controls="altTexts-panel"
-                      disabled={formUpdating}
-                      id="altTexts-tab"
-                      label="Alt Texts"
-                      onClick={() => setTabSection('altTexts')}
-                      selected={tabSection === 'altTexts'}
-                      tone={errors?.altTexts ? 'critical' : undefined}
-                      icon={errors?.altTexts ? WarningOutlineIcon : undefined}
-                      size={2}
-                    />
+                    {isImageAsset(currentAsset) && (
+                      <Tab
+                        aria-controls="altTexts-panel"
+                        disabled={formUpdating}
+                        id="altTexts-tab"
+                        label="Alt Texts"
+                        onClick={() => setTabSection('altTexts')}
+                        selected={tabSection === 'altTexts'}
+                        tone={errors?.altTexts ? 'critical' : undefined}
+                        icon={errors?.altTexts ? WarningOutlineIcon : undefined}
+                        size={2}
+                      />
+                    )}
                     <Tab
                       aria-controls="references-panel"
                       disabled={formUpdating}
@@ -365,16 +369,18 @@ const DialogAssetEdit = (props: Props) => {
                           value={currentAsset?.title}
                         />
                         {/* !! DEPRECATED !! - Alt text */}
-                        <FormFieldInputText
-                          {...register('altText')}
-                          icon={WarningOutlineIcon}
-                          disabled
-                          error={errors?.altText?.message}
-                          description='This field is deprecated. Use "Alt Texts" tab instead.'
-                          label="Alt Text"
-                          name="altText"
-                          value={currentAsset?.altText}
-                        />
+                        {isImageAsset(currentAsset) && (
+                          <FormFieldInputText
+                            {...register('altText')}
+                            icon={WarningOutlineIcon}
+                            disabled
+                            error={errors?.altText?.message}
+                            description='This field is deprecated. Use "Alt Texts" tab instead.'
+                            label="Alt Text"
+                            name="altText"
+                            value={currentAsset?.altText}
+                          />
+                        )}
                         {/* Description */}
                         <FormFieldInputTextarea
                           {...register('description')}
@@ -402,42 +408,44 @@ const DialogAssetEdit = (props: Props) => {
                       </Stack>
                     </TabPanel>
                     {/* Panel: Alt texts */}
-                    <TabPanel
-                      aria-labelledby="altTexts"
-                      hidden={tabSection !== 'altTexts'}
-                      id="alt-texts"
-                    >
-                      {altTextsError && (
-                        <Stack marginBottom={3}>
-                          <Card padding={[3, 3, 4]} radius={2} shadow={1} tone="critical">
-                            <Text size={1}>{altTextsError}</Text>
-                          </Card>
+                    {isImageAsset(currentAsset) && (
+                      <TabPanel
+                        aria-labelledby="altTexts"
+                        hidden={tabSection !== 'altTexts'}
+                        id="alt-texts"
+                      >
+                        {altTextsError && (
+                          <Stack marginBottom={3}>
+                            <Card padding={[3, 3, 4]} radius={2} shadow={1} tone="critical">
+                              <Text size={1}>{altTextsError}</Text>
+                            </Card>
+                          </Stack>
+                        )}
+                        <Stack space={2} style={{ height: '65dvh', overflowY: 'auto' }}>
+                          {languages.map(language => {
+                            const label = language.default
+                              ? `${language.title} (Default)`
+                              : language.title
+                            return (
+                              <FormFieldInputText
+                                key={language.code}
+                                {...register(`altTexts.${language.code}`, {
+                                  onChange: () => {
+                                    setTimeout(() => trigger('altTexts'), 0)
+                                  }
+                                })}
+                                disabled={formUpdating}
+                                error={errors?.altTexts?.[language.code]?.message}
+                                label={label}
+                                description={language.code}
+                                name={`altTexts.${language.code}`}
+                                value={currentAsset?.altTexts?.[language.code] || ''}
+                              />
+                            )
+                          })}
                         </Stack>
-                      )}
-                      <Stack space={2} style={{ height: '65dvh', overflowY: 'auto' }}>
-                        {languages.map(language => {
-                          const label = language.default
-                            ? `${language.title} (Default)`
-                            : language.title
-                          return (
-                            <FormFieldInputText
-                              key={language.code}
-                              {...register(`altTexts.${language.code}`, {
-                                onChange: () => {
-                                  setTimeout(() => trigger('altTexts'), 0)
-                                }
-                              })}
-                              disabled={formUpdating}
-                              error={errors?.altTexts?.[language.code]?.message}
-                              label={label}
-                              description={language.code}
-                              name={`altTexts.${language.code}`}
-                              value={currentAsset?.altTexts?.[language.code] || ''}
-                            />
-                          )
-                        })}
-                      </Stack>
-                    </TabPanel>
+                      </TabPanel>
+                    )}
                     {/* Panel: References */}
                     <TabPanel
                       aria-labelledby="references"
